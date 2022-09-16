@@ -28,7 +28,7 @@ $$
 
 ### Exemple for CPU : Intel Xeon Platinium
 
-
+<img width="854" alt="168429164-d5105376-0f25-4dea-a122-3c0d75555dfd" src="https://user-images.githubusercontent.com/24867893/190581083-9d14ff64-9732-4a86-8e16-c29a48a32e3b.png">
 
 ## :scroll: License
 
