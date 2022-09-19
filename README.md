@@ -36,6 +36,11 @@ $$
 
 <img width="854" alt="168429164-d5105376-0f25-4dea-a122-3c0d75555dfd" src="https://user-images.githubusercontent.com/24867893/190581083-9d14ff64-9732-4a86-8e16-c29a48a32e3b.png">
 
+## Architecture
+
+![Ecosystème - Frame 1(1)](https://user-images.githubusercontent.com/24867893/191020939-6548a8b2-3349-4fbe-a7ad-1abc17c0f774.jpg)
+
+
 ## :scroll: License
 
 MIT
