@@ -38,7 +38,7 @@ $$
 
 ## Process
 
-![Ecosystème - Frame 1(1)](https://user-images.githubusercontent.com/24867893/191020939-6548a8b2-3349-4fbe-a7ad-1abc17c0f774.jpg)
+![Screenshot_20220930_103916](https://user-images.githubusercontent.com/24867893/193230659-27ee35aa-fd75-432c-b187-8da7e5507a70.png)
 
 
 ## :scroll: License
