@@ -44,7 +44,7 @@ class State(BaseModel):
     netstats: Optional[float] = None
 
 
-class Benchmark(BaseModel):
+class Record(BaseModel):
     device_id: Optional[str] = None
     contributor: Optional[str] = None
     hardware: Optional[Hardware] = Hardware()
@@ -55,4 +55,4 @@ class Benchmark(BaseModel):
 if __name__ == '__main__':
     import json
 
-    print(json.dumps(Benchmark().dict(), indent=4))
+    print(json.dumps(Record().dict(), indent=4))
