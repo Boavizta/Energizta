@@ -4,19 +4,19 @@ from pydantic import BaseModel
 
 
 class CPU(BaseModel):
-    name: str
-    core_units: str
+    name: Optional[str] = None
+    core_units: Optional[str] = None
 
 
 class RAM(BaseModel):
     vendor: Optional[str] = None
-    capacity: float
+    capacity: Optional[float] = None
 
 
 class Disk(BaseModel):
-    type: str
-    vendor: str
-    capacity: float
+    type: Optional[str] = None
+    vendor: Optional[str] = None
+    capacity: Optional[float] = None
 
 
 class Hardware(BaseModel):
@@ -26,16 +26,22 @@ class Hardware(BaseModel):
 
 
 class StressResult(BaseModel):
-    batch_id: str
     type: str
-    power_type: str
-    load: float
-    power: float
+    dcmi_power: Optional[float] = None
+    rapl_power: Optional[float] = None
+    manual_power: Optional[float] = None
+    temperature: Optional[float] = None
+    disks_io: Optional[float] = None
+    ram_io: Optional[float] = None
+    cpu_percent_user: Optional[float] = None
+    cpu_percent_sys: Optional[float] = None
+    cpu_percent_iowait: Optional[float] = None
+    netstats: Optional[float] = None
 
 
 class Benchmark(BaseModel):
     device_id: str
-    contributor: str
+    contributor: Optional[str] = None
     hardware: Hardware
     stress_results: List[StressResult]
     date: str
