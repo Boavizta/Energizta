@@ -24,7 +24,24 @@ class Stressor:
 
 
 class RAMStressor(Stressor):
-    pass
+    def __init__(self, workers=2):
+        super().__init__()
+        self._workers_num = workers
+
+    @property
+    def workers(self):
+        return self._workers_num
+
+    @property
+    def name(self):
+        return 'stress-ng ram'
+
+    def start(self):
+        prog = '/usr/bin/stress-ng'
+        cmdline = f'--vm {self.workers} --vm-bytes 1G'
+
+        self._process = Popen([prog] + cmdline.split(), stdout=PIPE)
+
 
 
 class CPUStressor(Stressor):
@@ -35,6 +52,10 @@ class CPUStressor(Stressor):
     @property
     def num_cpu(self):
         return self._cpu_num
+
+    @property
+    def name(self):
+        return 'stress-ng cpu'
 
     def start(self, load_percent):
         prog = '/usr/bin/stress-ng'
