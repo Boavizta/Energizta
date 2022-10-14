@@ -31,7 +31,7 @@ class Power(BaseModel):
     value: Optional[float] = None
 
 
-class StressResult(BaseModel):
+class State(BaseModel):
     type: Optional[str] = None
     type: Optional[str] = None
     powers: Optional[List[Power]] = [Power()]
@@ -48,7 +48,7 @@ class Benchmark(BaseModel):
     device_id: Optional[str] = None
     contributor: Optional[str] = None
     hardware: Optional[Hardware] = Hardware()
-    stress_results: Optional[List[StressResult]] = [StressResult()]
+    states: Optional[List[State]] = [State()]
     date: Optional[str] = None
 
 
