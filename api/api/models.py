@@ -1,4 +1,5 @@
-from typing import List, Union, Optional
+import uuid
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -44,6 +45,7 @@ class State(BaseModel):
 
 
 class Record(BaseModel):
+    batch_id: uuid.UUID = uuid.uuid4()
     device_id: Optional[str] = None
     contributor: Optional[str] = None
     hardware: Optional[Hardware] = Hardware()
