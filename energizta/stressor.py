@@ -5,23 +5,45 @@ from subprocess import PIPE, Popen
 from time import ctime, sleep
 
 
-def start_stress(num_cpu, load_percent):
-    prog = '/usr/bin/stress-ng'
-    cmdline = f'--cpu {num_cpu} -l {load_percent}'
-
-    print(f'Executing {prog} {cmdline}')
-    p = Popen([prog] + cmdline.split(), stdout=PIPE)
-    return p
+class StressorException(Exception):
+    pass
 
 
-def stop_stress(process):
-    print(f'Killing process {process}')
-    process.kill()
-    print('Process killed!')
+class Stressor:
+    def __init__(self):
+        self._process = None
+
+    def start(self):
+        raise NotImplementedError()
+
+    def stop(self):
+        if not self._process:
+            raise StressorException('No process started!')
+
+        self._process.kill()
 
 
-def get_cpu_count():
-    return cpu_count()
+class RAMStressor(Stressor):
+    pass
+
+
+class CPUStressor(Stressor):
+    def __init__(self):
+        super().__init__()
+        self._cpu_num = cpu_count()
+
+    @property
+    def num_cpu(self):
+        return self._cpu_num
+
+    def start(self, load_percent):
+        prog = '/usr/bin/stress-ng'
+        cmdline = f'--cpu {self.num_cpu} -l {load_percent}'
+
+        if not self.num_cpu:
+            raise StressorException('Could not run stressor on 0 CPU!')
+
+        self._process = Popen([prog] + cmdline.split(), stdout=PIPE)
 
 
 def get_measure():
@@ -34,15 +56,15 @@ def send_results(measures):
 
 def main():
     measures = []
-    num_cpu = get_cpu_count()
-    print(f'Got {num_cpu} CPU(s)')
+
+    stress = CPUStressor()
 
     measures.append(get_measure())
     for i in range(0, 50, 10):
-        process = start_stress(num_cpu, i)
+        stress.start(i)
         sleep(5)
         measures.append(get_measure())
-        stop_stress(process)
+        stress.stop()
 
     send_results(measures)
 
