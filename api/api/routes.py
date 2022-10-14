@@ -1,4 +1,7 @@
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter
+
+from api.models import Benchmark
+
 
 route = APIRouter(
     prefix='/v1',
@@ -6,5 +9,5 @@ route = APIRouter(
 
 
 @route.post('/upload_benchmark')
-async def upload_benchmark(file: UploadFile) -> None:
-    pass
+async def benchmark(bench: Benchmark) -> Benchmark:
+    return bench
