@@ -2,7 +2,8 @@
 
 from multiprocessing import cpu_count
 from subprocess import PIPE, Popen
-from time import ctime, sleep
+from time import ctime, sleep, time
+from json import dump
 
 
 class StressorException(Exception):
@@ -71,8 +72,67 @@ def get_measure():
     return ctime()
 
 
-def send_results(measures):
+def send_results(stress_name, measures):
     print(measures)
+    querry = {}
+
+    hardware = {}
+    hardware["cpus"] = [
+                            {"name": "Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz", 
+                            "core_units": 8
+                            }
+                        ]
+    hardware["rams"] = [
+                            {
+                                "vendor": None,
+                                "capacity": 16
+                            }
+                        ]
+    hardware["disks"] = [
+                                {
+                                    "capacity": 931,
+                                    "vendor": "HGST",
+                                    "type": "hdd"
+                                },
+                                {
+                                    "capacity": 238,
+                                    "vendor": "Micron_1100_MTFD",
+                                    "type": "ssd"
+                                }
+                        ]
+    
+
+
+    querry["device_id"] = None
+    querry["contributor"] = None
+    querry["hardware"] = hardware
+
+    states = []
+    for measure in measures:
+        state = {
+                    "type": stress_name,
+                    "powers": [
+                        {
+                            "source": "should not be trusted",
+                            "scope": "cpu",
+                            "value": measure
+                        }
+                    ],
+                    "temperature": None,
+                    "disks_io": None,
+                    "ram_io": None,
+                    "cpu_percent_user": None,
+                    "cpu_percent_sys": None,
+                    "cpu_percent_iowait": None,
+                    "netstats": None
+                }
+        states.append(state)
+    querry["states"] = states 
+    querry["date"] = int(time())
+    with open("toto","w") as f:
+        dump(querry,f)
+
+
 
 
 def main():
@@ -87,7 +147,7 @@ def main():
         measures.append(get_measure())
         stress.stop()
 
-    send_results(measures)
+    send_results(stress.name, measures)
 
 
 if __name__ == "__main__":
