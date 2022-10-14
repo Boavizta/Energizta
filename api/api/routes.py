@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.models import Benchmark
+from api.models import Record
 
 
 route = APIRouter(
@@ -8,6 +8,6 @@ route = APIRouter(
 )
 
 
-@route.post('/upload_benchmark')
-async def benchmark(bench: Benchmark) -> Benchmark:
-    return bench
+@route.post('/upload_record')
+async def record(rec: Record) -> Record:
+    return rec
