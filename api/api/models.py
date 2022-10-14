@@ -20,16 +20,21 @@ class Disk(BaseModel):
 
 
 class Hardware(BaseModel):
-    cpus: Union[CPU, List[CPU]]
-    rams: Union[RAM, List[RAM]]
-    disks: Union[Disk, List[Disk]]
+    cpus: Optional[List[CPU]] = [CPU()]
+    rams: Optional[List[RAM]] = [RAM()]
+    disks: Optional[List[Disk]] = [Disk()]
+
+
+class Power(BaseModel):
+    source: Optional[str] = None
+    scope: Optional[str] = None
+    value: Optional[float] = None
 
 
 class StressResult(BaseModel):
-    type: str
-    dcmi_power: Optional[float] = None
-    rapl_power: Optional[float] = None
-    manual_power: Optional[float] = None
+    type: Optional[str] = None
+    type: Optional[str] = None
+    powers: Optional[List[Power]] = [Power()]
     temperature: Optional[float] = None
     disks_io: Optional[float] = None
     ram_io: Optional[float] = None
@@ -40,8 +45,14 @@ class StressResult(BaseModel):
 
 
 class Benchmark(BaseModel):
-    device_id: str
+    device_id: Optional[str] = None
     contributor: Optional[str] = None
-    hardware: Hardware
-    stress_results: List[StressResult]
-    date: str
+    hardware: Optional[Hardware] = Hardware()
+    stress_results: Optional[List[StressResult]] = [StressResult()]
+    date: Optional[str] = None
+
+
+if __name__ == '__main__':
+    import json
+
+    print(json.dumps(Benchmark().dict(), indent=4))
