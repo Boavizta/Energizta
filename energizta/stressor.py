@@ -44,7 +44,6 @@ class RAMStressor(Stressor):
         self._process = Popen([prog] + cmdline.split(), stdout=PIPE)
 
 
-
 class CPUStressor(Stressor):
     def __init__(self):
         super().__init__()
@@ -78,8 +77,9 @@ def send_results(stress_name, measures):
 
     hardware = {}
     hardware["cpus"] = [
-                            {"name": "Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz", 
-                            "core_units": 8
+                            {
+                                "name": "Intel(R) Core(TM) i7-7700HQ CPU",
+                                "core_units": 8
                             }
                         ]
     hardware["rams"] = [
@@ -100,8 +100,6 @@ def send_results(stress_name, measures):
                                     "type": "ssd"
                                 }
                         ]
-    
-
 
     querry["device_id"] = None
     querry["contributor"] = None
@@ -127,12 +125,10 @@ def send_results(stress_name, measures):
                     "netstats": None
                 }
         states.append(state)
-    querry["states"] = states 
+    querry["states"] = states
     querry["date"] = int(time())
-    with open("toto","w") as f:
-        dump(querry,f)
-
-
+    with open("toto", "w") as fs:
+        dump(querry, fs)
 
 
 def main():
