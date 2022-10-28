@@ -2,15 +2,16 @@
 
 **Warning:** this is still a very early stage project. Any feedback or contribution will be highly appreciated.
 
-energizta.sh is a simple script that focuses on retrieving every information that can be used to guess the power consumption of baremetal servers *with as much precision as possible*
+`energizta.sh` is a simple script that focuses on retrieving every information that can be used to guess the power consumption of baremetal servers *with as much precision as possible*
 
 It will try and find all power metrics available. Some are partial (RAPL), some should be global (DCMI, lm-sensors, PDU…) and some could even be inputed by a user looking at a wattmeter. The primary goal is to get all data possible for scientists to work on models.
 
-This first version has been written in bash4 and does not depend on anything else. The goal is to provide a simple script that can be run by anyone on any recent Linux server.
+This first version has been written in Bash4 and does not depend on anything else. The goal is to provide a simple script that can be run by anyone on any recent Linux server.
 
 ## How to install
 
 ```
+sudo apt-get install jq # That should be removed in final version
 wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
 chmod +x energizata.sh
 ```
@@ -32,7 +33,7 @@ To get the most various data, Energizta can run stress tests to put your server 
 
 To do this we use https://github.com/ColinIanKing/stress-ng
 
-On Debian : `aptitude install stress-ng`
+On Debian : `sudo apt-get install stress-ng`
 
 ```
 ./energizta.sh --stresstest [--debug]
