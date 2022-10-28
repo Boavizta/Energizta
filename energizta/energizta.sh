@@ -25,7 +25,8 @@
 ###
 
 # IDEAS :
-# - Allow to have an "additionnal facts" option to get more facts
+# - Allow to have an "additionnal facts" option to run a script that will get more facts
+# - fact: print number of rapl sources
 # - Do not use jq
 
 # This script should not be used with an interval < 5 because each loop can take 500ms and the interval is computed once for all the loop so you can get 10% margin of error. The greater the interval, the lower the margin of error. But some metrics are instant metrics (temp, dcmi, used mem), so the greater the interval the least those metrics are representative of the period. I believe a 5 to 10s interval is ideal.
