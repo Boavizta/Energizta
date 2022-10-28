@@ -22,9 +22,9 @@ Energizta is trying to address these problems and provide a set of tools to gues
 
 ## How?
 
-- 1. With a script that will focus on retrieving every information that can be used to guess the power consumption of baremetal servers *with as much precision as possible*.
-- 2. With a "citizen science" database were anyone can contribute by uploading the information returned by the script. This database will be opendata and should allow research scientists to work on models and equations to describe power usage based upon hardware specs and server load (realtime or average).
-- 3. With an API that will compile the result of the models and equations to provide power consumption estimation based upon what's available to the user given it's context.
+1. With a script that will focus on retrieving every information that can be used to guess the power consumption of baremetal servers *with as much precision as possible*.
+2. With a "citizen science" database were anyone can contribute by uploading the information returned by the script. This database will be opendata and should allow research scientists to work on models and equations to describe power usage based upon hardware specs and server load (realtime or average).
+3. With an API that will compile the result of the models and equations to provide power consumption estimation based upon what's available to the user given it's context.
 
 Examples of goals:
 
