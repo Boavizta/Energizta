@@ -26,7 +26,6 @@
 
 # IDEAS :
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
-# - fact: print number of rapl sources
 # - Do not use jq
 
 # This script should not be used with an interval < 5 because each loop can take 500ms and the interval is computed once for all the loop so you can get 10% margin of error. The greater the interval, the lower the margin of error. But some metrics are instant metrics (temp, dcmi, used mem), so the greater the interval the least those metrics are representative of the period. I believe a 5 to 10s interval is ideal.
@@ -211,21 +210,33 @@ compute_state() {
 
     # Sensors
     if [ -n "$(which sensors)" ]; then
-        state[sensors_acpi_watt]=$(sensors power_meter-acpi-0 | grep power1 | awk '{print $2}')
+        sensors_acpi_watt=$(sensors power_meter-acpi-0 2>/dev/null | grep power1 | awk '{print $2}')
+        if [ -n "$sensors_acpi_watt" ]; then
+            state[sensors_acpi_watt]=$sensors_acpi_watt
+        fi
         if ! $ENERGY_ONLY; then
-            state[sensors_coretemp]=$(sensors coretemp-isa-0000 | grep 'Package id 0' | grep -Eo '[0-9\.]*' | head -n 2 | tail -n 1)
+            state[sensors_coretemp]=$(sensors coretemp-isa-0000 2>/dev/null | grep 'Package id 0' | grep -Eo '[0-9\.]*' | head -n 2 | tail -n 1)
         fi
     fi
 
     # RAPL
     if [ -e /sys/class/powercap/intel-rapl:0 ] && [ -r /sys/class/powercap/intel-rapl:0/energy_uj ]; then
-        for package in /sys/class/powercap/intel-rapl:?; do
-            i=${package: -1}
+        for package in /sys/class/powercap/intel-rapl:*; do
+            i=$(echo "$package" | cut -d ':' -f 2)
+            name=$(cat "$package/name")
+            if [ "$name" == "dram" ]; then
+                name=dram_$i
+            elif [[ "$name" == package* ]]; then
+                name=package_$i
+            else
+                # For now we only manage package-X and dram
+                continue
+            fi
 
-            state[_rapl_${i}_energy_uj]=$(cat "$package/energy_uj")
+            state[_rapl_${name}_energy_uj]=$(cat "$package/energy_uj")
 
             if [ "$interval_s" -gt 0 ]; then
-                delta_uj=$((${state[_rapl_${i}_energy_uj]} - ${last_state[_rapl_${i}_energy_uj]}))
+                delta_uj=$((${state[_rapl_${name}_energy_uj]} - ${last_state[_rapl_${name}_energy_uj]}))
 
                 if [ "$delta_uj" -lt 0 ]; then
                     max_energy_range_uj=$(cat "$package/max_energy_range_uj")
@@ -233,7 +244,9 @@ compute_state() {
                 fi
 
                 (( state[_rapl_total_delta_energy_uj]+=delta_uj ))
-                state[rapl_total_watt]=$((state[_rapl_total_watt] + (delta_uj / (interval_us))))
+                state[rapl_${name}_watt]=$((delta_uj / (interval_us)))
+                state[rapl_total_watt]=$((state[rapl_total_watt] + (delta_uj / (interval_us))))
+                state[rapl_nb_src]=$((state[rapl_nb_src] + 1))
             fi
 
         done
