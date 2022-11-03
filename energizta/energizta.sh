@@ -28,6 +28,7 @@
 # IDEAS :
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 # - Do not use jq
+# - Test and suggest to install ipmi-tools
 
 
 VERSION="0.1"
@@ -58,6 +59,12 @@ STRESSTEST=false
 MANUAL_INPUT=false
 DEBUG=false
 FORCE_WITHOUT_ROOT=false
+# This command can hangs indefinitely so we have to test it with timeout
+if timeout 1 /usr/sbin/ipmi-dcmi --get-system-power-statistics > /dev/null 2>&1; then
+    DCMI=true
+else
+    DCMI=false
+fi
 
 while [ -n "$1" ]; do
     case $1 in
@@ -157,7 +164,8 @@ compute_state() {
     #state[date]=$(date +%s)
 
     # DCMI1
-    if dcmi=$(/usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null); then
+    if $DCMI; then
+        dcmi=$(timeout .1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
         if echo "$dcmi" | grep -q 'Active$'; then
             state[_dcmi_cur_power_1]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
         fi
@@ -261,7 +269,8 @@ compute_state() {
     fi
 
     # DCMI2
-    if dcmi=$(/usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null); then
+    if $DCMI; then
+        dcmi=$(/usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
         if echo "$dcmi" | grep -q 'Active$'; then
             state[_dcmi_cur_power_2]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
             state[dcmi_cur_power]=$(((state[_dcmi_cur_power_1] + state[_dcmi_cur_power_2]) / 2))
