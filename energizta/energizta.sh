@@ -62,7 +62,7 @@ while [ -n "$1" ]; do
         --interval) shift; INTERVAL=$1 ;;
         --warmup) shift; WARMUP=$1 ;;
         --duration) shift; DURATION=$1 ;;
-        --energy-only) ENERGY_ONLY=false ;;
+        --energy-only) ENERGY_ONLY=true ;;
         --manual-input) MANUAL_INPUT=true ;;
 
         --stresstest) STRESSTEST=true ;;
