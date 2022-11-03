@@ -347,7 +347,6 @@ if $STRESSTEST; then
 else
     while true; do
         WARMUP=0
-        DURATION=20
         get_states
     done
 fi
