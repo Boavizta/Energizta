@@ -27,6 +27,20 @@ It will run until you use Ctrl+C to stop it.
 
 `energizta.sh` gives you various options that are documented in `./energizta --help`
 
+### Options
+
+```
+--interval INTERVAL   Measure server state each INTERVAL seconds (default 5)
+--duration DURATION   Stop each stresstest after DURATION seconds (default 60)
+--manual-input        Ask the user to enter power metrics manually (from a Wattmeter…)
+
+--debug               Display debug outputs
+--continuous          Display the current state every INTERVAL seconds instead of an average state every DURATION seconds
+--energy-only         Only displays energy variables instead of global state (load, cpu, etc.)
+```
+
+> This script should not be used with an INTERVAL lower than 1 because each loop can take 500ms so it can cause significant load. Also, the greater the INTERVAL between each loop, the lower the margin of error on interval dependant measures (disk usage, RAPL power). With that said, some metrics are realtime metrics (temp, dcmi, used mem), so the greater the interval, the least those metrics are representative of the period. I believe a 2 to 10s INTERVAL is ideal.
+
 ## Stresstest
 
 To get the most various data, Energizta can run stress tests to put your server in various load level. I will make your server work at 10%, 50%, 100%… and take measurement for each state.
@@ -48,6 +62,15 @@ If you want to run your own stress tests, you can by providing a file. Each line
 ```
 ./energizta.sh --stressfile my_stress_tests.txt
 ```
+
+### Options
+
+```
+--stresstest          Run a stresstest
+--stressfile FILEPATH Load alternative stress tests commands from a file instead of default stresstest
+--warmup WARMUP       Wait WARMUP seconds after lauching a stresstest before measuring state (default 20)
+```
+
 
 ## How to run in the background (with systemd)
 

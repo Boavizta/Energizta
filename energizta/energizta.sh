@@ -5,12 +5,12 @@
 ### Main options:
 ###   --interval INTERVAL   Measure server state each INTERVAL seconds (default 5)
 ###   --duration DURATION   Stop each stresstest after DURATION seconds (default 60)
-###   --warmup WARMUP       Wait WARMUP seconds after lauching a stresstest before measuring state (default 20)
 ###   --manual-input        Ask the user to enter power metrics manually (from a Wattmeter…)
 ###
 ### Stresstest options :
 ###   --stresstest          Run a stresstest
 ###   --stressfile FILEPATH Load alternative stress tests commands from a file instead of default stresstest
+###   --warmup WARMUP       Wait WARMUP seconds after lauching a stresstest before measuring state (default 20)
 ###
 ### Display options:
 ###   --debug               Display debug outputs
@@ -28,7 +28,6 @@
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 # - Do not use jq
 
-# This script should not be used with an interval < 5 because each loop can take 500ms and the interval is computed once for all the loop so you can get 10% margin of error. The greater the interval, the lower the margin of error. But some metrics are instant metrics (temp, dcmi, used mem), so the greater the interval the least those metrics are representative of the period. I believe a 5 to 10s interval is ideal.
 
 VERSION="0.1"
 
