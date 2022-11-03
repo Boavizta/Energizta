@@ -38,6 +38,11 @@ if ! ((BASH_VERSINFO[0] >= 4)); then
     exit 1
 fi
 
+if hostnamectl status | grep -q 'Chassis: vm'; then
+    echo "This script does not work on virtual servers."
+    exit 1
+fi
+
 usage () {
     sed -rn 's/^### ?//;T;p' "$0"
     echo "v$VERSION"
