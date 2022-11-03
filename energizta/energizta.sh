@@ -6,6 +6,7 @@
 ###   --interval INTERVAL   Measure server state each INTERVAL seconds (default 5)
 ###   --duration DURATION   Stop each stresstest after DURATION seconds (default 60)
 ###   --manual-input        Ask the user to enter power metrics manually (from a Wattmeter…)
+###   --once                Do not loop, print one metric and exit
 ###
 ### Stresstest options :
 ###   --stresstest          Run a stresstest
@@ -50,6 +51,7 @@ debug () {
 INTERVAL=5
 WARMUP=20
 DURATION=60
+ONCE=false
 CONTINUOUS=false
 ENERGY_ONLY=false
 STRESSTEST=false
@@ -60,15 +62,16 @@ FORCE_WITHOUT_ROOT=false
 while [ -n "$1" ]; do
     case $1 in
         --interval) shift; INTERVAL=$1 ;;
-        --warmup) shift; WARMUP=$1 ;;
         --duration) shift; DURATION=$1 ;;
-        --energy-only) ENERGY_ONLY=true ;;
+        --once) ONCE=true ;;
         --manual-input) MANUAL_INPUT=true ;;
 
         --stresstest) STRESSTEST=true ;;
         --stressfile) shift; STRESSTEST=true; STRESSFILE=$1 ;;
+        --warmup) shift; WARMUP=$1 ;;
 
         --continuous) CONTINUOUS=true ;;
+        --energy-only) ENERGY_ONLY=true ;;
         --debug) DEBUG=true ;;
 
         --force-without-root) FORCE_WITHOUT_ROOT=true ;;
@@ -78,6 +81,12 @@ while [ -n "$1" ]; do
     esac
     shift
 done
+
+if $STRESSTEST && $ONCE; then
+    echo "You cannot use --once and --stresstest together."
+    usage
+    exit 1
+fi
 
 if [ -n "$STRESSFILE" ]; then
     if [ -f "$STRESSFILE" ]; then
@@ -345,8 +354,13 @@ if $STRESSTEST; then
         fi
     done
 else
-    while true; do
+    if $ONCE; then
         WARMUP=0
         get_states
-    done
+    else
+        while true; do
+            WARMUP=0
+            get_states
+        done
+    fi
 fi
