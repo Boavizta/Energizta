@@ -104,7 +104,7 @@ fi
 
 
 # We don't want to leave a stress test running after this script
-trap '[ -n "$(jobs -p)" ] && kill $(jobs -p)' EXIT
+trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT
 
 
 declare -gA state
