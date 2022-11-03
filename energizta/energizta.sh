@@ -218,7 +218,7 @@ compute_state() {
 
     # Sensors
     if [ -n "$(which sensors)" ]; then
-        sensors_acpi_watt=$(sensors power_meter-acpi-0 2>/dev/null | grep power1 | awk '{print $2}')
+        sensors_acpi_watt=$(sensors power_meter-acpi-0 2>/dev/null | grep power1 | grep -v '4.29 MW' | awk '{print $2}')
         if [ -n "$sensors_acpi_watt" ]; then
             state[sensors_acpi_watt]=$sensors_acpi_watt
         fi
