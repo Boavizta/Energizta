@@ -28,7 +28,8 @@
 # IDEAS :
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 # - Do not use jq
-# - Test and suggest to install ipmi-tools
+# - Test and suggest to install ipmi-dcmi (freeipmi-tools)
+# - Test and suggest to install ipmitool
 
 
 VERSION="0.1"
@@ -64,12 +65,6 @@ STRESSTEST=false
 MANUAL_INPUT=false
 DEBUG=false
 FORCE_WITHOUT_ROOT=false
-# This command can hangs indefinitely so we have to test it with timeout
-if timeout 1 /usr/sbin/ipmi-dcmi --get-system-power-statistics > /dev/null 2>&1; then
-    DCMI=true
-else
-    DCMI=false
-fi
 
 while [ -n "$1" ]; do
     case $1 in
@@ -77,6 +72,7 @@ while [ -n "$1" ]; do
         --duration) shift; DURATION=$1 ;;
         --once) ONCE=true ;;
         --manual-input) MANUAL_INPUT=true ;;
+        --ipmi-sensor-id) shift; IPMI_SENSOR_ID=$1 ;;
 
         --stresstest) STRESSTEST=true ;;
         --stressfile) shift; STRESSTEST=true; STRESSFILE=$1 ;;
@@ -93,6 +89,29 @@ while [ -n "$1" ]; do
     esac
     shift
 done
+
+# This command can hangs indefinitely so we have to test it with timeout
+dcmi=$(timeout 1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
+DCMI=false
+if echo "$dcmi" | grep -q 'Active$'; then
+    if [ "$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')" -gt 0 ]; then
+        DCMI=true
+    else
+        debug "ipmi-dcmi Current Power = 0, ignoring"
+    fi
+else
+    debug "ipmi-dcmi does not work"
+fi
+
+if ! $DCMI && [ -z "$IPMI_SENSOR_ID" ]; then
+    debug "ipmi-dcmi does not work, trying ipmitool sensor"
+    IPMI_SENSOR_ID=$(sudo timeout 10 ipmitool sensor | grep Watt | tail -n 1 | sed 's/  .*//g')
+    if [ -n "$IPMI_SENSOR_ID" ]; then
+        debug "Found IPMI sensor id $IPMI_SENSOR_ID"
+    fi
+fi
+
+IPMI_SENSOR_NAME=$(echo "$IPMI_SENSOR_ID" | tr '[:upper:]' '[:lower:]' | sed 's/ /_/g')
 
 if $STRESSTEST && $ONCE; then
     echo "You cannot use --once and --stresstest together."
@@ -172,7 +191,7 @@ compute_state() {
     if $DCMI; then
         dcmi=$(timeout .1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
         if echo "$dcmi" | grep -q 'Active$'; then
-            state[_dcmi_cur_power_1]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
+            state[_dcmi_cur_watt_1]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
         fi
     fi
 
@@ -277,12 +296,18 @@ compute_state() {
     if $DCMI; then
         dcmi=$(/usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
         if echo "$dcmi" | grep -q 'Active$'; then
-            state[_dcmi_cur_power_2]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
-            state[dcmi_cur_power]=$(((state[_dcmi_cur_power_1] + state[_dcmi_cur_power_2]) / 2))
-            state[_dcmi_avg_power]=$(echo "$dcmi" | grep 'Average Power over sampling duration' | awk '{print $7}')
+            state[_dcmi_cur_watt_2]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
+            state[dcmi_cur_watt]=$(((state[_dcmi_cur_watt_1] + state[_dcmi_cur_watt_2]) / 2))
+            state[_dcmi_avg_watt]=$(echo "$dcmi" | grep 'Average Power over sampling duration' | awk '{print $7}')
             state[_dcmi_stat_period]=$(echo "$dcmi" | grep 'Statistics reporting time period' | awk '{print $6 $7}')
         fi
     fi
+
+    # IPMITOOL
+    if [ -n "$IPMI_SENSOR_ID" ]; then
+        state[ipmi_${IPMI_SENSOR_NAME}_watt]=$(timeout 3 ipmitool sdr get "$IPMI_SENSOR_ID" | grep 'Sensor Reading' | grep -Eo '[0-9]+' | head -n 1)
+    fi
+
 
     state_string=$(declare -p state)
     eval "declare -gA last_state=${state_string#*=}"
@@ -290,11 +315,11 @@ compute_state() {
 
 get_manual_input() {
     if $MANUAL_INPUT; then
-        read -rp "Enter the average power for the last $((state[interval_us] / 1000000)) seconds (int or float, in Watt): " input </dev/tty 2>/dev/tty
+        read -rp "Enter the average power in Watt for the last $((state[interval_us] / 1000000)) seconds (int or float, in Watt): " input </dev/tty 2>/dev/tty
         while ! [[ $input =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]; do
             read -rp "\"$input\" is not an int or a float: " input </dev/tty 2>/dev/tty
         done
-        state[manual_input_power]=$input
+        state[manual_input_watt]=$input
     fi
 }
 
