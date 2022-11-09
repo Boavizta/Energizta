@@ -27,12 +27,11 @@
 
 # IDEAS :
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
-# - Do not use jq
 # - Test and suggest to install ipmi-dcmi (freeipmi-tools)
 # - Test and suggest to install ipmitool
 
 
-VERSION="0.1"
+VERSION="0.1a"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
     echo "This script needs to be run with bash >= 4."
@@ -159,7 +158,7 @@ compute_avg_state() {
         avg_state[nb_states]=$((avg_state[nb_states] + 1))
     fi
     for j in "${!state[@]}"; do
-        if [[ ! "$j" == _* ]] && [[ ! "$j" == 'interval_us' ]]; then
+        if [[ ! "$j" == _* ]] && [[ ! "$j" == "energizta_version" ]]; then
             if [ -z "${avg_state[$j]}" ]; then
                 avg_state[$j]=${state[$j]}
             else
@@ -168,7 +167,8 @@ compute_avg_state() {
             fi
         fi
     done
-    avg_state[interval_us]=$((avg_state[interval_us]+state[interval_us]))
+    avg_state[duration_us]=$((avg_state[duration_us]+state[interval_us]))
+    avg_state[energizta_version]=$ENERGIZTA_VERSION
 }
 
 compute_state() {
@@ -286,7 +286,7 @@ compute_state() {
                 (( state[_rapl_total_delta_energy_uj]+=delta_uj ))
                 state[rapl_${name}_watt]=$((delta_uj / (interval_us)))
                 state[rapl_total_watt]=$((state[rapl_total_watt] + (delta_uj / (interval_us))))
-                state[rapl_nb_src]=$((state[rapl_nb_src] + 1))
+                state[_rapl_nb_src]=$((state[rapl_nb_src] + 1))
             fi
 
         done
@@ -324,21 +324,32 @@ get_manual_input() {
 }
 
 print_state() {
-    # TODO : Avoid jq ? too slow ?
+    # Can help for debug
+    #for j in "${!state[@]}"; do
+        #if [[ ! "$j" == _* ]]; then
+            #echo "$j"
+            #echo "${state[$j]}"
+        #fi
+    #done | jq -n -R -c 'reduce inputs as $j ({}; . + { ($j): (input|(tonumber? // .)) })'
+    (
+    echo "{\"interval_us\": ${state[interval_us]},"
+    [ -n "${state[duration_us]}" ] && echo "\"duration_us\": ${state[duration_us]},"
+    [ -n "${state[nb_states]}" ] && echo "\"nb_states\": ${state[nb_states]},"
     for j in "${!state[@]}"; do
-        if [[ ! "$j" == _* ]]; then
-            echo "$j"
-            echo "${state[$j]}"
+        if [[ ! "$j" == _* ]] && [[ $j =~ ([a-z0-9]_(pct_busy|read_bps|write_bps)|cpu_[a-z_]|mem_[a-z_]|load1|sensors_coretemp) ]]; then
+            echo "\"$j\": ${state[$j]}",
         fi
-    done | jq -n -R -c 'reduce inputs as $j ({}; . + { ($j): (input|(tonumber? // .)) })'
-    #echo ---
-    #for key in "${!state[@]}"; do
-        #if [[ ! "$key" == _* ]]; then
-            #echo "${key}:  ${state[$key]}"
-        #fi;
-    #done
-    #echo "{\"powers\": [{\"source\": null, \"scope\": null, \"value\": null}], \"temperature\": null, \"disks_io\": null, "ram_io": null, "cpu_percent_user": null, "cpu_percent_sys": null, "cpu_percent_iowait": null, "netstats": null
-        #}"
+    done | sort
+    echo "\"powers\": {"
+    for j in "${!state[@]}"; do
+        if [[ ! "$j" == _* ]] && [[ $j =~ ([a-z0-9_]_watt) ]]; then
+            echo "\"$j\": ${state[$j]}",
+        fi
+    done | sort | sed '$ s/,$//'
+    echo "},"
+    echo "\"energizta_version\": \"$VERSION\"}"
+    ) | tr -d '\n'
+    echo ""
 }
 
 get_states () {
