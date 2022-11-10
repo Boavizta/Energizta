@@ -64,6 +64,8 @@ STRESSTEST=false
 MANUAL_INPUT=false
 DEBUG=false
 FORCE_WITHOUT_ROOT=false
+WITH_TIMESTAMP=false
+WITH_DATE=false
 
 while [ -n "$1" ]; do
     case $1 in
@@ -79,6 +81,8 @@ while [ -n "$1" ]; do
 
         --continuous) CONTINUOUS=true ;;
         --energy-only) ENERGY_ONLY=true ;;
+        --with-timestamp) WITH_TIMESTAMP=true ;;
+        --with-date) WITH_DATE=true ;;
         --debug) DEBUG=true ;;
 
         --force-without-root) FORCE_WITHOUT_ROOT=true ;;
@@ -157,7 +161,7 @@ compute_avg_state() {
         avg_state[nb_states]=$((avg_state[nb_states] + 1))
     fi
     for j in "${!state[@]}"; do
-        if [[ ! "$j" == _* ]] && [[ ! "$j" == "energizta_version" ]]; then
+        if [[ ! "$j" =~ ^(_.*|energizta_version|timestamp|date)$ ]]; then
             if [ -z "${avg_state[$j]}" ]; then
                 avg_state[$j]=${state[$j]}
             else
@@ -167,6 +171,8 @@ compute_avg_state() {
         fi
     done
     avg_state[duration_us]=$((avg_state[duration_us]+state[interval_us]))
+    $WITH_TIMESTAMP && avg_state[timestamp]=$(date +%s)
+    $WITH_DATE && avg_state[date]=$(date +'%Y-%m-%d %H:%M:%S')
     avg_state[energizta_version]=$ENERGIZTA_VERSION
 }
 
@@ -184,6 +190,8 @@ compute_state() {
     interval_s=$((interval_us / 1000000))
     state[interval_us]=$interval_us
     state[_interval_s]=$interval_s
+    $WITH_TIMESTAMP && state[timestamp]=$(date +%s)
+    $WITH_DATE && state[date]=$(date +'%Y-%m-%d %H:%M:%S')
     #state[date]=$(date +%s)
 
     # DCMI1
@@ -332,6 +340,8 @@ print_state() {
     #done | jq -n -R -c 'reduce inputs as $j ({}; . + { ($j): (input|(tonumber? // .)) })'
     (
     echo "{\"interval_us\": ${state[interval_us]},"
+    [ -n "${state[timestamp]}" ] && echo "\"timestamp\": ${state[timestamp]},"
+    [ -n "${state[date]}" ] && echo "\"date\": \"${state[date]}\","
     [ -n "${state[duration_us]}" ] && echo "\"duration_us\": ${state[duration_us]},"
     [ -n "${state[nb_states]}" ] && echo "\"nb_states\": ${state[nb_states]},"
     for j in "${!state[@]}"; do
