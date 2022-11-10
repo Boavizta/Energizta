@@ -1,6 +1,10 @@
 # Energizta
 
+
+Energizta is a collaborative project to collect and report open-data on the energy consumption of IT equipments.
+
 **Warning: this is still a very early stage project. Any feedback or contribution will be highly appreciated.**
+
 
 Science is still at an early stage for computer energy consumption measurement. Most energy consumption metrology agents take a simplified approach and estimate that CPU+RAM consumption represents the majority of power consumption on most common servers (CPU, RAM, SSD or disk… no GPU). That's because, at first glance, what will mostly impact power consumption is the CPU load, and because this is a metric that we can get on all recent Intel and AMD CPUs with a tool named RAPL.
 
