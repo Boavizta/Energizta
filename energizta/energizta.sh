@@ -34,12 +34,12 @@
 VERSION="0.1a"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
-    echo "This script needs to be run with bash >= 4."
+    >&2 echo "This script needs to be run with bash >= 4."
     exit 1
 fi
 
 if hostnamectl status | grep -q 'Chassis: vm'; then
-    echo "This script does not work on virtual servers."
+    >&2 echo "This script does not work on virtual servers."
     exit 1
 fi
 
@@ -89,6 +89,12 @@ while [ -n "$1" ]; do
     shift
 done
 
+
+if [ -n "$USER" ] && [ "$USER" != "root" ] && ! $FORCE_WITHOUT_ROOT; then
+    >&2 echo "This script must be run as root."
+    exit 1
+fi
+
 # This command can hangs indefinitely so we have to test it with timeout
 dcmi=$(timeout 1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
 DCMI=false
@@ -113,7 +119,7 @@ fi
 IPMI_SENSOR_NAME=$(echo "$IPMI_SENSOR_ID" | tr '[:upper:]' '[:lower:]' | sed 's/ /_/g')
 
 if $STRESSTEST && $ONCE; then
-    echo "You cannot use --once and --stresstest together."
+    >&2 echo "You cannot use --once and --stresstest together."
     usage
     exit 1
 fi
@@ -122,7 +128,7 @@ if [ -n "$STRESSFILE" ]; then
     if [ -f "$STRESSFILE" ]; then
         stresstests=$(cat "$STRESSFILE")
     else
-        echo "$STRESSFILE does not exist"
+        >&2 echo "$STRESSFILE does not exist"
         exit 1
     fi
 else
@@ -133,13 +139,6 @@ stress-ng -q --cpu 4
 stress-ng -q --cpu 8
 """
 fi
-
-if [ "${USER}" != "root" ] && ! $FORCE_WITHOUT_ROOT; then
-    echo "This script must be run as root."
-    exit 1
-fi
-
-
 
 
 # We don't want to leave a stress test running after this script
