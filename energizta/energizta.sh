@@ -145,10 +145,6 @@ stress-ng -q --cpu 8
 fi
 
 
-# We don't want to leave a stress test running after this script
-trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT
-
-
 declare -gA state
 declare -gA avg_state
 declare -gA last_state
@@ -391,6 +387,9 @@ get_states () {
 }
 
 if $STRESSTEST; then
+    # We don't want to leave a stress test running after this script
+    trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT
+
     echo "$stresstests" | while IFS= read -r stresstest ; do
         if [ -n "$stresstest" ]; then
             debug "Running \"$stresstest\" for $((DURATION)) seconds"
