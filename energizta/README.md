@@ -13,7 +13,7 @@ This first version has been written in Bash4 and does not depend on anything els
 ```
 sudo apt-get install jq # That should be removed in final version
 wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
-chmod +x energizata.sh
+chmod +x energizta.sh
 ```
 
 ## How to use
