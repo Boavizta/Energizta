@@ -114,7 +114,7 @@ fi
 
 if ! $DCMI && [ -z "$IPMI_SENSOR_ID" ]; then
     debug "ipmi-dcmi does not work, trying ipmitool sensor"
-    IPMI_SENSOR_ID=$(sudo timeout 10 ipmitool sensor | grep Watt | tail -n 1 | sed 's/  .*//g')
+    IPMI_SENSOR_ID=$(timeout 10 ipmitool sensor 2>/dev/null | grep Watt | tail -n 1 | sed 's/  .*//g')
     if [ -n "$IPMI_SENSOR_ID" ]; then
         debug "Found IPMI sensor id $IPMI_SENSOR_ID"
     fi
