@@ -190,14 +190,6 @@ compute_state() {
     $WITH_DATE && state[date]=$(date +'%Y-%m-%d %H:%M:%S')
     #state[date]=$(date +%s)
 
-    # DCMI1
-    if $DCMI; then
-        dcmi=$(timeout .1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
-        if echo "$dcmi" | grep -q 'Active$'; then
-            state[_dcmi_cur_watt_1]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
-        fi
-    fi
-
     if ! $ENERGY_ONLY; then
         state[energizta_version]="$VERSION"
 
@@ -295,14 +287,11 @@ compute_state() {
         done
     fi
 
-    # DCMI2
+    # DCMI
     if $DCMI; then
-        dcmi=$(/usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
+        dcmi=$(timeout .3 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
         if echo "$dcmi" | grep -q 'Active$'; then
-            state[_dcmi_cur_watt_2]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
-            state[dcmi_cur_watt]=$(((state[_dcmi_cur_watt_1] + state[_dcmi_cur_watt_2]) / 2))
-            state[_dcmi_avg_watt]=$(echo "$dcmi" | grep 'Average Power over sampling duration' | awk '{print $7}')
-            state[_dcmi_stat_period]=$(echo "$dcmi" | grep 'Statistics reporting time period' | awk '{print $6 $7}')
+            state[dcmi_cur_watt]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
         fi
     fi
 
