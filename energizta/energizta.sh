@@ -250,7 +250,10 @@ compute_state() {
             state[sensors_acpi_watt]=$sensors_acpi_watt
         fi
         if ! $ENERGY_ONLY; then
-            state[sensors_coretemp]=$(sensors coretemp-isa-0000 2>/dev/null | grep 'Package id 0' | grep -Eo '[0-9\.]*' | head -n 2 | tail -n 1)
+            sensors_coretemp=$(sensors coretemp-isa-0000 2>/dev/null | grep 'Package id 0' | grep -Eo '[0-9\.]*' | head -n 2 | tail -n 1)
+            if [ -n "$sensors_coretemp" ]; then
+                state[sensors_coretemp]=$sensors_coretemp
+            fi
         fi
     fi
 
