@@ -303,7 +303,10 @@ compute_state() {
 
     # IPMITOOL
     if [ -n "$IPMI_SENSOR_ID" ]; then
-        state[ipmi_${IPMI_SENSOR_NAME}_watt]=$(timeout 3 ipmitool sdr get "$IPMI_SENSOR_ID" | grep 'Sensor Reading' | grep -Eo '[0-9]+' | head -n 1)
+        ipmi_watt=$(timeout 3 ipmitool sdr get "$IPMI_SENSOR_ID" | grep 'Sensor Reading' | grep -Eo '[0-9]+' | head -n 1)
+        if [ -n "$ipmi_watt" ]; then
+            state[ipmi_${IPMI_SENSOR_NAME}_watt]=$ipmi_watt
+        fi
     fi
 
 
