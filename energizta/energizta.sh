@@ -6,7 +6,7 @@
 ###   --interval INTERVAL   Measure server state each INTERVAL seconds (default 5)
 ###   --duration DURATION   Stop each stresstest after DURATION seconds (default 60)
 ###   --manual-input        Ask the user to enter power metrics manually (from a Wattmeter…)
-###   --once                Do not loop, print one metric and exit
+###   --once                Do not loop, print one state and exit
 ###
 ### Stresstest options :
 ###   --stresstest          Run a stresstest
@@ -17,6 +17,8 @@
 ###   --debug               Display debug outputs
 ###   --continuous          Display the current state every INTERVAL seconds instead of an average state every DURATION seconds
 ###   --energy-only         Only displays energy variables instead of global state (load, cpu, etc.)
+###   --with_timestamp      Include timestamp in displayed variables
+###   --with_date           Include datetime in displayed variables
 ###
 ### Misc options :
 ###   --force-without-root  Force the script to run with current user

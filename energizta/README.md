@@ -32,11 +32,15 @@ It will run until you use Ctrl+C to stop it.
 ```
 --interval INTERVAL   Measure server state each INTERVAL seconds (default 5)
 --duration DURATION   Stop each stresstest after DURATION seconds (default 60)
+--once                Do not loop, print one state and exit
 --manual-input        Ask the user to enter power metrics manually (from a Wattmeter…)
 
 --debug               Display debug outputs
 --continuous          Display the current state every INTERVAL seconds instead of an average state every DURATION seconds
 --energy-only         Only displays energy variables instead of global state (load, cpu, etc.)
+--with_timestamp      Include timestamp in displayed variables
+--with_date           Include datetime in displayed variables
+
 ```
 
 > This script should not be used with an INTERVAL lower than 1 because each loop can take 500ms so it can cause significant load. Also, the greater the INTERVAL between each loop, the lower the margin of error on interval dependant measures (disk usage, RAPL power). With that said, some metrics are realtime metrics (temp, dcmi, used mem), so the greater the interval, the least those metrics are representative of the period. I believe a 2 to 10s INTERVAL is ideal.
@@ -105,6 +109,10 @@ Please be aware that `energizta.sh` outputs JSON lines that can take a lot of sp
 ## How to send us your results!
 
 TODO
+
+### About the "host" variable
+
+The "host" variable is actually the UUID of the `/` partition. It will be used in our database to group states by host, to study one host, or to exclude one host of the study. This UUID will not change between runs and should be unique to your computer. But it is also completely anonymous and cannot be used to identify your computer on the internet. That's why we did not use the hostname of the mac address.
 
 ## Other similar projets :
 
