@@ -66,6 +66,7 @@ DEBUG=false
 FORCE_WITHOUT_ROOT=false
 WITH_TIMESTAMP=false
 WITH_DATE=false
+HOST_ID="$(lsblk -o UUID,MOUNTPOINT | grep ' /$' -m 1 | cut -d ' ' -f 1)"
 
 while [ -n "$1" ]; do
     case $1 in
@@ -327,7 +328,9 @@ print_state() {
         #fi
     #done | jq -n -R -c 'reduce inputs as $j ({}; . + { ($j): (input|(tonumber? // .)) })'
     (
-    echo "{\"interval_us\": ${state[interval_us]},"
+    echo "{"
+    $ENERGY_ONLY || echo "\"host\": \"$HOST_ID\","
+    echo "\"interval_us\": ${state[interval_us]},"
     [ -n "${state[timestamp]}" ] && echo "\"timestamp\": ${state[timestamp]},"
     [ -n "${state[date]}" ] && echo "\"date\": \"${state[date]}\","
     [ -n "${state[duration_us]}" ] && echo "\"duration_us\": ${state[duration_us]},"
