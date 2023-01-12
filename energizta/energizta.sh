@@ -230,21 +230,23 @@ compute_state() {
         state[mem_used_MB]=$(((meminfo[0] - meminfo[1] - meminfo[2] - meminfo[3]) / 1024)) # total - free - buffer - cache
 
         # Diskstats
+        # kernel handles sectors by 512bytes
+        # http://www.mjmwired.net/kernel/Documentation/block/stat.txt
+        SECTOR_SIZE_BYTE=512
+
         if [ -f "/proc/diskstats" ]; then
             DISKSTATS="$(cat /proc/diskstats)"
             for dev in /sys/block/*; do
                 dev="${dev##*/}"
                 if [ -L "/sys/block/$dev/device" ]; then
-                    state[_${dev}_read]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $4}')
-                    state[_${dev}_write]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $8}')
-                    #state[_${dev}_sectors_read]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $16}')
-                    #state[_${dev}_sectors_write]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $10}')
-                    state[_${dev}_time_io]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $13}')
+                    state[_${dev}_sectors_read]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $6}')
+                    state[_${dev}_sectors_write]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $10}')
+                    state[_${dev}_time_io_ms]=$(echo "$DISKSTATS" | grep " $dev " | awk '{print $13}')
                     if [ "$interval_s" -gt 0 ]; then
-                        state[${dev}_read_bps]=$(((${state[_${dev}_read]} - ${last_state[_${dev}_read]}) / interval_s))
-                        state[${dev}_write_bps]=$(((${state[_${dev}_write]} - ${last_state[_${dev}_write]}) / interval_s))
-                        state[_${dev}_delta_time_io]=$((${state[_${dev}_time_io]} - ${last_state[_${dev}_time_io]}))
-                        state[${dev}_pct_busy]=$((100 * ${state[_${dev}_delta_time_io]} / (interval_us / 1000)))
+                        state[${dev}_read_kBps]=$(((${state[_${dev}_sectors_read]} - ${last_state[_${dev}_sectors_read]}) * SECTOR_SIZE_BYTE / interval_s / 1024))
+                        state[${dev}_write_kBps]=$(((${state[_${dev}_sectors_write]} - ${last_state[_${dev}_sectors_write]}) * SECTOR_SIZE_BYTE / interval_s / 1024))
+                        state[_${dev}_delta_time_io_ms]=$((${state[_${dev}_time_io_ms]} - ${last_state[_${dev}_time_io_ms]}))
+                        state[${dev}_pct_busy]=$((100 * ${state[_${dev}_delta_time_io_ms]} / (interval_us / 1000)))
                     fi
                 fi
             done
@@ -346,7 +348,7 @@ print_state() {
     [ -n "${state[duration_us]}" ] && echo "\"duration_us\": ${state[duration_us]},"
     [ -n "${state[nb_states]}" ] && echo "\"nb_states\": ${state[nb_states]},"
     for j in "${!state[@]}"; do
-        if [[ ! "$j" == _* ]] && [[ $j =~ ([a-z0-9]_(pct_busy|read_bps|write_bps)|cpu_[a-z_]|mem_[a-z_]|load1|sensors_coretemp) ]]; then
+        if [[ ! "$j" == _* ]] && [[ $j =~ ([a-z0-9]_(pct_busy|read_kBps|write_kBps)|cpu_[a-z_]|mem_[a-z_]|load1|sensors_coretemp) ]]; then
             echo "\"$j\": ${state[$j]}",
         fi
     done | sort
