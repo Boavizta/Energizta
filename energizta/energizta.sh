@@ -45,6 +45,11 @@ if hostnamectl status | grep -q 'Chassis: vm'; then
     exit 1
 fi
 
+if hostnamectl status | grep -q 'Chassis: container'; then
+    >&2 echo "This script does not work in containers."
+    exit 1
+fi
+
 usage () {
     sed -rn 's/^### ?//;T;p' "$0"
     echo "v$VERSION"
