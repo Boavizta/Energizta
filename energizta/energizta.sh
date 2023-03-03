@@ -57,7 +57,7 @@ usage () {
 
 debug () {
     if $DEBUG; then
-        echo "-- DEBUG: $1"
+        echo "-- $(date +"%Y-%m-%d %H:%M:%S") - DEBUG: $1"
     fi
 }
 
