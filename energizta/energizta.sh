@@ -8,10 +8,13 @@
 ###   --manual-input        Ask the user to enter power metrics manually (from a Wattmeter…)
 ###   --once                Do not loop, print one state and exit
 ###
-### Stresstest options :
+### Stresstest options:
 ###   --stresstest          Run a stresstest
 ###   --stressfile FILEPATH Load alternative stress tests commands from a file instead of default stresstest
 ###   --warmup WARMUP       Wait WARMUP seconds after lauching a stresstest before measuring state (default 20)
+###
+### Collaborative DB options:
+###   --send-to-db          Send the states to Boavizta's Energizta collaborative database
 ###
 ### Display options:
 ###   --debug               Display debug outputs
@@ -19,6 +22,8 @@
 ###   --energy-only         Only displays energy variables instead of global state (load, cpu, etc.)
 ###   --with_timestamp      Include timestamp in displayed variables
 ###   --with_date           Include datetime in displayed variables
+###   --short-host-id       Use shorter string as HOST_ID and avoid the need for lshw (not compatible with --send-to-db)
+###   --force-host-id ID    Force an alternative HOST_ID, use $(hostname) for instance (not compatible with --send-to-db)
 ###
 ### Misc options :
 ###   --force-without-root  Force the script to run with current user
@@ -29,11 +34,10 @@
 
 # IDEAS :
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
-# - Test and suggest to install ipmi-dcmi (freeipmi-tools)
-# - Test and suggest to install ipmitool
 
 
 VERSION="0.1a"
+ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
     >&2 echo "This script needs to be run with bash >= 4."
@@ -73,7 +77,11 @@ DEBUG=false
 FORCE_WITHOUT_ROOT=false
 WITH_TIMESTAMP=false
 WITH_DATE=false
-HOST_ID="$(lsblk -o UUID,MOUNTPOINT | grep ' /$' -m 1 | cut -d ' ' -f 1)"
+REGISTER_ON_DB=false
+SEND_TO_DB=false
+HOST_ID=""
+#MACHINE_ID=$(cat /etc/machine-id) # Can change at every reboot?
+MACHINE_ID=$(lsblk -o UUID,MOUNTPOINT 2>/dev/null | grep ' /$' -m 1 | cut -d ' ' -f 1)
 
 while [ -n "$1" ]; do
     case $1 in
@@ -86,6 +94,10 @@ while [ -n "$1" ]; do
         --stresstest) STRESSTEST=true ;;
         --stressfile) shift; STRESSTEST=true; STRESSFILE=$1 ;;
         --warmup) shift; WARMUP=$1 ;;
+
+        --send-to-db) SEND_TO_DB=true; REGISTER_ON_DB=true ;;
+        --short-host-id) HOST_ID=$MACHINE_ID ;;
+        --force-host-id) shift; HOST_ID=$1 ;;
 
         --continuous) CONTINUOUS=true ;;
         --energy-only) ENERGY_ONLY=true ;;
@@ -105,6 +117,48 @@ done
 if [ -n "$USER" ] && [ "$USER" != "root" ] && ! $FORCE_WITHOUT_ROOT; then
     >&2 echo "This script must be run as root."
     exit 1
+fi
+
+
+if [ -z "$HOST_ID" ] ; then
+    if $FORCE_WITHOUT_ROOT; then
+        >&2 echo "With --force-without-root you need to use --short-host-id or --force-host-id"
+        exit 1
+    fi
+
+    if ! command -v lshw > /dev/null; then
+        >&2 echo "Please install lshw command."
+        exit 1
+    fi
+
+    hardware="$(lshw -short 2>/dev/null | tail -n +4 | grep -v "  volume  " | sed "s/ *disk */ /" | sed -E "s/.*  //" | grep -Ev "Ethernet interface|PnP device|Project-Id-Version" | sed 's/.*/"&"/' | sed ':a; N; $!ba; s/\n/,\n/g' | sed '1 i\[' | sed '$a\]')"
+
+    software="{\"arch\": \"$(arch)\", \"uname\": \"$(uname -a | awk '{ $2="";print}')\", \"distrib\": \"$(lsb_release -ds)\"}"
+
+    hardware_id=$(echo "$hardware" | md5sum | awk '{print $1}')
+    software_id=$(echo "$software" | md5sum | awk '{print $1}')
+
+    HOST_ID="${MACHINE_ID}_${hardware_id}_${software_id}"
+
+    HOST="""
+{
+\"id\": \"$HOST_ID\",
+\"hardware\": $hardware,
+\"software\": $software
+}
+"""
+fi
+
+if $REGISTER_ON_DB; then
+    if [ -z "$HOST" ]; then
+        >&2 echo "You cannot use both --short-host-id or --force-host-id AND --send-to-db"
+        exit 1
+    fi
+    if ! command -v curl > /dev/null; then
+        >&2 echo "Please install curl command."
+        exit 1
+    fi
+    TMPFILE=$(mktemp /tmp/energizta-XXXXXX.json)
 fi
 
 # This command can hangs indefinitely so we have to test it with timeout
@@ -387,16 +441,21 @@ get_states () {
             print_state
         else
             compute_avg_state
-            debug "$(print_state)"
+            debug "Intermediate state: $(print_state)"
         fi
         n=$((n+1))
     done
 
     if ! $CONTINUOUS; then
+        debug "Got $n states during $((DURATION - WARMUP))s, merging:"
         avg_state_string=$(declare -p avg_state)
         eval "declare -gA state=${avg_state_string#*=}"
         get_manual_input
-        print_state
+        state_json=$(print_state)
+        echo "$state_json"
+        if $SEND_TO_DB; then
+            echo "$state_json" >> "$TMPFILE"
+        fi
         unset avg_state
         declare -gA avg_state
     fi
@@ -437,4 +496,68 @@ else
             get_states
         done
     fi
+fi
+
+
+# Endgame:
+# - register the host on Boavizta's Energizta database
+# - and send the results of the run
+if $SEND_TO_DB; then
+    while true; do
+        read -rp "=> Do you still want to send above data to Boavizta's Energizta database? (y/n) " yn
+        echo ""
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* )
+                echo "If you change your mind you can still try to send it with this command:"
+                echo "curl --upload-file $TMPFILE $ENERGIZTA_DB_URL/pub/states"
+                exit
+                ;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+
+    echo "Checking if $HOST_ID is registered in Boavizta's Energizta database…"
+    case "$(curl "$ENERGIZTA_DB_URL/pub/test_host/$HOST_ID" 2> /dev/null)" in
+        "OK" )
+            echo "This host is already in DB."
+            ;;
+        "NOK" )
+            echo "We need to register some information about your hardware and software."
+            echo "It should be completely anonymous:"
+            echo "$HOST"
+
+            while true; do
+                read -rp "=> Do you allow to register this on Boavizta's Energizta database? (y/n) " yn
+                echo ""
+                case $yn in
+                    [Yy]* ) break;;
+                    [Nn]* ) echo "OK Bye."; exit;; # :TODO:maethor:20230227: If you change your mind…
+                    * ) echo "Please answer yes or no.";;
+                esac
+            done
+
+            echo "Registering $HOST_ID in Boavizta's Energizta database…"
+            ret_code="$(curl -s -o /dev/stderr --write-out '%{response_code}' -X POST --header 'content-type: application/json' --data "$HOST" "$ENERGIZTA_DB_URL/pub/host")"
+            if [ "$ret_code" -ge 400 ]; then
+                echo "Abording. Sorry."
+                exit 1
+            fi
+            echo "This host is now registered."
+            ;;
+        * )
+            echo "Unmanaged exception"
+            exit 1
+            ;;
+    esac
+
+    echo ""
+
+    echo "Sending results to Energizta collaborative database…"
+    ret_code=$(curl -s -o /dev/stderr --write-out '%{response_code}' --upload-file "$TMPFILE" "$ENERGIZTA_DB_URL/pub/states")
+    if [ "$ret_code" -lt 400 ]; then
+        echo "Done. Thank you!"
+    fi
+
+    rm "$TMPFILE"
 fi
