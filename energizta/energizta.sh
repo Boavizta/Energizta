@@ -108,6 +108,9 @@ if [ -n "$USER" ] && [ "$USER" != "root" ] && ! $FORCE_WITHOUT_ROOT; then
 fi
 
 # This command can hangs indefinitely so we have to test it with timeout
+if ! command -v ipmi-dcmi > /dev/null; then
+    >&2 echo "You should try to install ipmi-dcmi (package freeipmi-tools)"
+fi
 dcmi=$(timeout 1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
 DCMI=false
 if echo "$dcmi" | grep -q 'Active$'; then
@@ -122,6 +125,9 @@ fi
 
 if ! $DCMI && [ -z "$IPMI_SENSOR_ID" ]; then
     debug "ipmi-dcmi does not work, trying ipmitool sensor"
+    if ! command -v ipmitool > /dev/null; then
+        >&2 echo "You should try to install ipmitool"
+    fi
     IPMI_SENSOR_ID=$(timeout 10 ipmitool sensor 2>/dev/null | grep Watt | tail -n 1 | sed 's/  .*//g')
     if [ -n "$IPMI_SENSOR_ID" ]; then
         debug "Found IPMI sensor id $IPMI_SENSOR_ID"
