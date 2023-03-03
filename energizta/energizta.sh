@@ -404,7 +404,7 @@ get_states () {
 
 if $STRESSTEST; then
     # We don't want to leave a stress test running after this script
-    trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT
+    trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT SIGHUP SIGINT SIGTERM
 
     echo "$stresstests" | while IFS= read -r stresstest ; do
         if [ -n "$stresstest" ]; then
