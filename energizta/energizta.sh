@@ -229,11 +229,14 @@ compute_state() {
         fi
 
         # Meminfo
-        # shellcheck disable=SC2207
-        meminfo=( $(grep -E 'MemTotal|MemFree|Buffers|Cached|Shmem|SReclaimable|SUnreclaim' /proc/meminfo |awk '{print $1 " " $2}' |tr '\n' ' ' |tr -d ':' |awk '{ printf("%i %i %i %i %i %i %i", $2, $4, $6, $8, $10, $12, $14) }') )
-        state[mem_total_MB]=$((meminfo[0] / 1024))
-        state[mem_free_MB]=$((meminfo[1] / 1024))
-        state[mem_used_MB]=$(((meminfo[0] - meminfo[1] - meminfo[2] - meminfo[3]) / 1024)) # total - free - buffer - cache
+        meminfo=$(grep -E '^(MemTotal|MemFree|Buffers|Cached)' /proc/meminfo)
+        mem_total=$(echo "$meminfo" | grep MemTotal | awk '{print $2}')
+        mem_free=$(echo "$meminfo" | grep MemFree | awk '{print $2}')
+        mem_buffers=$(echo "$meminfo" | grep Buffers | awk '{print $2}')
+        mem_cached=$(echo "$meminfo" | grep Cached | awk '{print $2}')
+        state[mem_total_MB]=$((mem_total / 1024))
+        state[mem_free_MB]=$((mem_free / 1024))
+        state[mem_used_MB]=$(((mem_total - mem_free - mem_buffers - mem_cached) / 1024))
 
         # Diskstats
         # kernel handles sectors by 512bytes
