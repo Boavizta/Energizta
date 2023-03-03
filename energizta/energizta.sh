@@ -65,6 +65,10 @@ usage () {
     echo "v$VERSION"
 }
 
+info () {
+    echo "-- $(date +"%Y-%m-%d %H:%M:%S") - INFO: $1"
+}
+
 debug () {
     if $DEBUG; then
         echo "-- $(date +"%Y-%m-%d %H:%M:%S") - DEBUG: $1"
@@ -471,9 +475,11 @@ if $STRESSTEST; then
     # We don't want to leave a stress test running after this script
     trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT SIGHUP SIGINT SIGTERM
 
+    info "This test should take $((DURATION * $(echo "$stresstests" | wc -l)))s"
+
     echo "$stresstests" | while IFS= read -r stresstest ; do
         if [ -n "$stresstest" ]; then
-            debug "Running \"$stresstest\" for $((DURATION)) seconds"
+            info "Running \"$stresstest\" for $((DURATION)) seconds"
             $stresstest > /dev/null &
             pid=$!
 
