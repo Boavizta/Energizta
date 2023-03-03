@@ -29,6 +29,12 @@
 ###   --force-without-root  Force the script to run with current user
 ###   --help                Display this help
 ###
+### Examples :
+###   sudo ./energizta.sh # Measure every 5 seconds and display a state every 60 seconds
+###   sudo ./energizta.sh --interval 1 --duration 1 --once # Just do one measure and print the result
+###   sudo ./energizta.sh --continuous # Measure and display a state every 5 seconds
+###   sudo ./energizta.sh --stresstest --send-to-db # Do a stress test and send states to Boavizta
+###
 ### This script need to be run as root because RAPL and DCMI power metrics are only accessible by root.
 ###
 
