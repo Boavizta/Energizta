@@ -475,7 +475,7 @@ if $STRESSTEST; then
     # We don't want to leave a stress test running after this script
     trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT SIGHUP SIGINT SIGTERM
 
-    info "This test should take $((DURATION * $(echo "$stresstests" | wc -l)))s"
+    info "This test should take $((DURATION * $(echo "$stresstests" | grep -vc '^$')))s"
 
     echo "$stresstests" | while IFS= read -r stresstest ; do
         if [ -n "$stresstest" ]; then
