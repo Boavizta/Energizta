@@ -37,3 +37,10 @@ For more information see [Quickstart for energita's contributers 🚀](https://b
 ## Full documentation 📘
 
 [Go to documentation 📘](https://boavizta.github.io/Energizta/)
+
+
+## Other similar projets
+
+ - Scaphandre : https://github.com/hubblo-org/scaphandre
+ - PowerJoular : https://gitlab.com/joular/powerjoular
+ - PowerAPI: https://github.com/powerapi-ng/
