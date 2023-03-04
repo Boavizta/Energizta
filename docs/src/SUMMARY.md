@@ -1,5 +1,6 @@
 [Introduction 🔖](intro.md)
 [Quickstart for energita's contributers 🚀](quickstart.md)
+[FAQ 🔌](FAQ.md)
 
 # Data collection 📡
 
