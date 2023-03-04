@@ -4,7 +4,7 @@ First, move `energizta.sh` to `/usr/local/sbin/energizta.sh`.
 
 Then, create a new file `/etc/systemd/system/energizta.service`
 
-```
+```bash
 [Unit]
 Description=Energizta
 
@@ -18,7 +18,7 @@ WantedBy=multi-user.target
 
 Then activate and run the service
 
-```
+```bash
 systemctl daemon-reload
 systemctl enable energizta
 systemctl start energizta

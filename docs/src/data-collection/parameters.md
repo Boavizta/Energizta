@@ -1,6 +1,6 @@
 # Main options
 
-```
+```bash
 --interval INTERVAL   Measure server state each INTERVAL seconds (default 5)
 --duration DURATION   Stop each stresstest after DURATION seconds (default 60)
 --once                Do not loop, print one state and exit

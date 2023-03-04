@@ -8,7 +8,7 @@ This first version has been written in Bash4 and does not depend on anything els
 
 ## How to install
 
-```
+```bash
 wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
 chmod +x energizta.sh
 sudo apt-get install awk sed curl lshw
@@ -16,7 +16,7 @@ sudo apt-get install awk sed curl lshw
 
 ## How to use
 
-```
+```bash
 ./energizta.sh --help
 sudo ./energizta.sh
 ```

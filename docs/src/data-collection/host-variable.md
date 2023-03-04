@@ -12,7 +12,7 @@ The idea is that hardware and software upgrade can affect power consumption, so 
 
 If you want a shorter id, or a custom id, you can use :
 
-```
+```bash
 --short-host-id       Use shorter string as HOST_ID and avoid the need for lshw
 --force-host-id ID    Force an alternative HOST_ID, use $(hostname) for instance
 ```

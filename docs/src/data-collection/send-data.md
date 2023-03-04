@@ -2,7 +2,7 @@
 
 The main goal of this tool is to stresstest your computer or baremetal server, and send the results to Energizta collaborative database. It will also send the hardware and OS.
 
-```
+```bash
 sudo ./energizta.sh --stresstest --send-to-db
 ```
 
