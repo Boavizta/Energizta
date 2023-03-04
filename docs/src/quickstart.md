@@ -1,5 +1,7 @@
 # Quickstart for energita's contributers
 
+This page is dedicated to people who want to contribute quickly to the Energizta data repository. If you wish to understand the details of the project, please read the rest of the documentation
+
 ```bash
 wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
 chmod +x energizta.sh
