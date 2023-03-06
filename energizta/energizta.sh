@@ -476,10 +476,14 @@ get_states () {
 }
 
 if $STRESSTEST; then
-    # We don't want to leave a stress test running after this script
-    trap '[ -n "$(jobs -p)" ] && kill "$(jobs -p)"' EXIT SIGHUP SIGINT SIGTERM
+    if ! command -v stress-ng > /dev/null; then
+        >&2 echo "Please install stress-ng command."
+        exit 1
+    fi
 
     info "This test should take $((DURATION * $(echo "$stresstests" | grep -vc '^$')))s"
+
+    set -e
 
     echo "$stresstests" | while IFS= read -r stresstest ; do
         if [ -n "$stresstest" ]; then
@@ -487,13 +491,20 @@ if $STRESSTEST; then
             $stresstest > /dev/null &
             pid=$!
 
+            trap 'kill "$pid"' EXIT SIGHUP SIGINT SIGTERM
+
             if ! ps -p $pid > /dev/null; then
                 echo "$stresstest has failed"
-                break
+                exit 1
             fi
 
             debug "-- Warming up for $WARMUP seconds…"
             sleep "$WARMUP"
+
+            if ! ps -p $pid > /dev/null; then
+                echo "$stresstest has failed"
+                kill $PROC 10
+            fi
 
             debug "-- Starting to get states…"
             get_states
@@ -513,6 +524,8 @@ else
         done
     fi
 fi
+
+set +e
 
 
 # Endgame:
