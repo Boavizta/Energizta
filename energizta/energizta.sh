@@ -12,9 +12,7 @@
 ###   --stresstest          Run a stresstest
 ###   --stressfile FILEPATH Load alternative stress tests commands from a file instead of default stresstest
 ###   --warmup WARMUP       Wait WARMUP seconds after lauching a stresstest before measuring state (default 20)
-###
-### Collaborative DB options:
-###   --send-to-db          Send the states to Boavizta's Energizta collaborative database
+###   --send-to-db          Send the stresstest results to Boavizta's Energizta collaborative database
 ###
 ### Display options:
 ###   --debug               Display debug outputs
@@ -202,6 +200,12 @@ IPMI_SENSOR_NAME=$(echo "$IPMI_SENSOR_ID" | tr '[:upper:]' '[:lower:]' | sed 's/
 
 if $STRESSTEST && $ONCE; then
     >&2 echo "You cannot use --once and --stresstest together."
+    usage
+    exit 1
+fi
+
+if $SEND_TO_DB && ! $STRESSTEST; then
+    >&2 echo "--send-to-db needs to be used with --stress-test."
     usage
     exit 1
 fi

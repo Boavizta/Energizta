@@ -13,7 +13,7 @@ This first version has been written in Bash4 and does not depend on anything els
 ```
 wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
 chmod +x energizta.sh
-sudo apt-get install awk sed curl lshw
+sudo apt-get install sed curl lshw stress-ng
 ```
 
 ## How to use
