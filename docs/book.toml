@@ -1,0 +1,6 @@
+[book]
+authors = ["@maethor - Guillaume Subiron", "Boavizta"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Energizta"
