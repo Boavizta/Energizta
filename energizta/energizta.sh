@@ -172,11 +172,11 @@ if $REGISTER_ON_DB; then
     TMPFILE=$(mktemp /tmp/energizta-XXXXXX.json)
 fi
 
-# This command can hangs indefinitely so we have to test it with timeout
 if ! command -v ipmi-dcmi > /dev/null; then
     >&2 echo "You should try to install ipmi-dcmi (package freeipmi-tools)"
 fi
-dcmi=$(timeout 1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
+# This command can hangs indefinitely so we have to test it with timeout
+dcmi=$(timeout 1 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null || true )
 DCMI=false
 if echo "$dcmi" | grep -q 'Active$'; then
     if [ "$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')" -gt 0 ]; then
@@ -193,7 +193,7 @@ if ! $DCMI && [ -z "$IPMI_SENSOR_ID" ]; then
     if ! command -v ipmitool > /dev/null; then
         >&2 echo "You should try to install ipmitool"
     fi
-    IPMI_SENSOR_ID=$(timeout 10 ipmitool sensor 2>/dev/null | grep Watt | tail -n 1 | sed 's/  .*//g')
+    IPMI_SENSOR_ID=$(timeout 10 ipmitool sensor 2>/dev/null | grep Watt | tail -n 1 | sed 's/  .*//g' || true)
     if [ -n "$IPMI_SENSOR_ID" ]; then
         debug "Found IPMI sensor id $IPMI_SENSOR_ID"
     fi
@@ -382,7 +382,7 @@ compute_state() {
 
     # DCMI
     if $DCMI; then
-        dcmi=$(timeout .3 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null)
+        dcmi=$(timeout .3 /usr/sbin/ipmi-dcmi --get-system-power-statistics 2>/dev/null || true)
         if echo "$dcmi" | grep -q 'Active$'; then
             state[dcmi_cur_watt]=$(echo "$dcmi" | grep 'Current Power' | awk '{print $4}')
         fi
@@ -390,7 +390,7 @@ compute_state() {
 
     # IPMITOOL
     if [ -n "$IPMI_SENSOR_ID" ]; then
-        ipmi_watt=$(timeout 3 ipmitool sdr get "$IPMI_SENSOR_ID" | grep 'Sensor Reading' | grep -Eo '[0-9]+' | head -n 1)
+        ipmi_watt=$(timeout 3 ipmitool sdr get "$IPMI_SENSOR_ID" | grep 'Sensor Reading' | grep -Eo '[0-9]+' | head -n 1 || true)
         if [ -n "$ipmi_watt" ]; then
             state[ipmi_${IPMI_SENSOR_NAME}_watt]=$ipmi_watt
         fi
