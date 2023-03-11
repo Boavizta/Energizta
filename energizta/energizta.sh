@@ -221,12 +221,24 @@ if [ -n "$STRESSFILE" ]; then
         exit 1
     fi
 else
-    stresstests="""
-sleep 120
-stress-ng -q --cpu 1
-stress-ng -q --cpu 4
-stress-ng -q --cpu 8
-"""
+    _stresstests () {
+        cores=$(grep -c '^processor' /proc/cpuinfo)
+
+        echo "sleep $((DURATION + 30))"
+
+        i=1;
+        while [ $i -le "$cores" ]; do
+            echo "stress-ng -q --cpu $i"
+            echo "stress-ng -q --getrandom $i"
+            echo "stress-ng -q --iomix $i"
+            i=$((i * 2))
+        done
+
+        echo "stress-ng -q --io 2"
+        echo "stress-ng -q --hdd 2"
+        echo "stress-ng -q --io 2 --hdd 2"
+    }
+    stresstests="$(_stresstests)"
 fi
 
 
