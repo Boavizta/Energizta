@@ -495,18 +495,21 @@ get_states () {
 }
 
 if $STRESSTEST; then
+    # shellcheck disable=SC2172
     if ! command -v stress-ng > /dev/null; then
         >&2 echo "Please install stress-ng command."
         exit 1
     fi
 
-    info "This test should take $((DURATION * $(echo "$stresstests" | grep -vc '^$')))s"
+    nb_tests=$(echo "$stresstests" | grep -vc '^$')
+    info "Running $nb_tests tests of ${DURATION}s each, should take $((DURATION * $(echo "$stresstests" | grep -vc '^$')))s"
+    t=1
 
     set -e
 
-    echo "$stresstests" | while IFS= read -r stresstest ; do
+    while IFS= read -r stresstest ; do
         if [ -n "$stresstest" ]; then
-            info "Running \"$stresstest\" for $((DURATION)) seconds"
+            info "($t/$nb_tests) Running \"$stresstest\" for $((DURATION)) seconds"
             $stresstest > /dev/null &
             pid=$!
 
@@ -522,7 +525,7 @@ if $STRESSTEST; then
 
             if ! ps -p $pid > /dev/null; then
                 echo "$stresstest has failed"
-                kill $PROC 10
+                exit 1
             fi
 
             debug "-- Starting to get states…"
@@ -530,8 +533,9 @@ if $STRESSTEST; then
 
             kill $pid > /dev/null 2>&1
             echo ""
+            t=$((t+1))
         fi
-    done
+    done < <(echo "$stresstests")
 else
     if $ONCE; then
         WARMUP=0
