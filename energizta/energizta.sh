@@ -513,7 +513,7 @@ if $STRESSTEST; then
             $stresstest > /dev/null &
             pid=$!
 
-            trap 'kill "$pid"' EXIT SIGHUP SIGINT SIGTERM
+            trap 'kill "$pid"' SIGHUP SIGINT SIGTERM
 
             if ! ps -p $pid > /dev/null; then
                 echo "$stresstest has failed"
