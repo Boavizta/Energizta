@@ -231,6 +231,7 @@ else
             echo "stress-ng -q --cpu $i"
             echo "stress-ng -q --getrandom $i"
             echo "stress-ng -q --iomix $i"
+            echo "stress-ng -q --memrate $i"
             i=$((i * 2))
         done
 
