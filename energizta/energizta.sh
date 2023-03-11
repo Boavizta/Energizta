@@ -431,6 +431,7 @@ print_state() {
             #echo "${state[$j]}"
         #fi
     #done | jq -n -R -c 'reduce inputs as $j ({}; . + { ($j): (input|(tonumber? // .)) })'
+    comment="$1"
     (
     echo "{"
     $ENERGY_ONLY || echo "\"host\": \"$HOST_ID\","
@@ -451,6 +452,9 @@ print_state() {
         fi
     done | sort | sed '$ s/,$//'
     echo "},"
+    if [ -n "$comment" ]; then
+        echo "\"comment\": \"$comment\","
+    fi
     echo "\"energizta_version\": \"$VERSION\"}"
     ) | tr -d '\n'
     echo ""
@@ -480,7 +484,7 @@ get_states () {
         avg_state_string=$(declare -p avg_state)
         eval "declare -gA state=${avg_state_string#*=}"
         get_manual_input
-        state_json=$(print_state)
+        state_json=$(print_state "$1")
         echo "$state_json"
         if $SEND_TO_DB; then
             echo "$state_json" >> "$TMPFILE"
@@ -522,7 +526,7 @@ if $STRESSTEST; then
             fi
 
             debug "-- Starting to get states…"
-            get_states
+            get_states "Stresstest: $stresstest"
 
             kill $pid > /dev/null 2>&1
             echo ""
