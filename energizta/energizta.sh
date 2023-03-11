@@ -40,7 +40,7 @@
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 
 
-VERSION="0.1a"
+VERSION="0.1"
 ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
@@ -139,7 +139,10 @@ if [ -z "$HOST_ID" ] ; then
         exit 1
     fi
 
-    hardware="$(lshw -short 2>/dev/null | tail -n +4 | grep -v "  volume  " | sed "s/ *disk */ /" | sed -E "s/.*  //" | grep -Ev "Ethernet interface|PnP device|Project-Id-Version" | sed 's/.*/"&"/' | sed ':a; N; $!ba; s/\n/,\n/g' | sed '1 i\[' | sed '$a\]')"
+    # Remove header | Filter out some unused lines | Convert line by line to json dicts (with 2 or 3 keys) | Convert everthing to json list
+    # Parsing `lshw -json` with jq could be easier but we do not want jq as a dependency
+    # So let's hope `lshw -short` format does not change too much
+    hardware="$(lshw -short 2>/dev/null | sed '0,/^=======/d' | grep -Ev "Ethernet interface|PnP device|Project-Id-Version" | grep -Ev "  (volume|bus)  " | sed 's/^[^ ]*  *//g' | sed -r 's/^([^ ]+)  +([^ ]+)  +(.*)/{"system": "\2", "logicalname": "\1",  "product": "\3"}/g' | sed -r 's/^([^ ]+)  +(.*)$/{"class": "\1", "product": "\2"}/g' | sed ':a; N; $!ba; s/\n/,\n/g' | sed '1 i\[' | sed '$a\]')"
 
     software="{\"arch\": \"$(arch)\", \"uname\": \"$(uname -a | awk '{ $2="";print}')\", \"distrib\": \"$(lsb_release -ds)\"}"
 
