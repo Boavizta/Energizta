@@ -509,32 +509,32 @@ if $STRESSTEST; then
     set -e
 
     while IFS= read -r stresstest ; do
+        echo ""
         if [ -n "$stresstest" ]; then
             info "($t/$nb_tests) Running \"$stresstest\" for $((DURATION)) seconds"
+            t=$((t+1))
             $stresstest > /dev/null &
             pid=$!
 
             trap 'kill "$pid"' SIGHUP SIGINT SIGTERM
 
             if ! ps -p $pid > /dev/null; then
-                echo "$stresstest has failed"
-                exit 1
+                info "$stresstest has failed immediately. Stresstest aborted."
+                continue
             fi
 
             debug "-- Warming up for $WARMUP seconds…"
             sleep "$WARMUP"
 
             if ! ps -p $pid > /dev/null; then
-                echo "$stresstest has failed"
-                exit 1
+                info "$stresstest has failed during warmup. Stresstest aborted."
+                continue
             fi
 
             debug "-- Starting to get states…"
             get_states "Stresstest: $stresstest"
 
             kill $pid > /dev/null 2>&1
-            echo ""
-            t=$((t+1))
         fi
     done < <(echo "$stresstests")
 else
@@ -551,11 +551,11 @@ fi
 
 set +e
 
-
 # Endgame:
 # - register the host on Boavizta's Energizta database
 # - and send the results of the run
 if $SEND_TO_DB; then
+    echo ""
     while true; do
         read -rp "=> Do you still want to send above data to Boavizta's Energizta database? (y/n) " yn
         echo ""
