@@ -1,0 +1,366 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Energizta</title>
+        <meta name="robots" content="noindex" />
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction 🔖</a></li><li class="chapter-item expanded affix "><a href="quickstart.html">Quickstart for energita's contributers 🚀</a></li><li class="chapter-item expanded affix "><a href="FAQ.html">FAQ ❔</a></li><li class="chapter-item expanded affix "><li class="part-title">Data collection 📡</li><li class="chapter-item expanded "><a href="data-collection/energizta-sh.html"><strong aria-hidden="true">1.</strong> Setup energizta.sh</a></li><li class="chapter-item expanded "><a href="data-collection/parameters.html"><strong aria-hidden="true">2.</strong> Parameters</a></li><li class="chapter-item expanded "><a href="data-collection/default-mode.html"><strong aria-hidden="true">3.</strong> Default mode</a></li><li class="chapter-item expanded "><a href="data-collection/stress-test-mode.html"><strong aria-hidden="true">4.</strong> Stress test mode</a></li><li class="chapter-item expanded "><a href="data-collection/host-variables.html"><strong aria-hidden="true">5.</strong> Host variables</a></li><li class="chapter-item expanded "><a href="data-collection/send-data.html"><strong aria-hidden="true">6.</strong> How to send us your results</a></li><li class="chapter-item expanded "><a href="data-collection/run-energizta-in-background.html"><strong aria-hidden="true">7.</strong> How to run in the background (with systemd)</a></li><li class="chapter-item expanded affix "><li class="part-title">Data mining 🔍</li><li class="chapter-item expanded "><a href="data-mining/questions.html"><strong aria-hidden="true">8.</strong> Question to be answered </a></li><li class="chapter-item expanded "><a href="data-mining/data-pipeline.html"><strong aria-hidden="true">9.</strong> Data pipeline</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Energizta</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="energizta"><a class="header" href="#energizta">Energizta</a></h1>
+<p>Energizta is a collaborative project to collect and report open-data on the energy consumption of servers.</p>
+<p><strong>Warning: this is still a very early stage project. Any feedback or contribution will be highly appreciated.</strong></p>
+<p><img src="images/principle.excalidraw.png" alt="principle of Energizta" title="Principle of Energizta" /></p>
+<h2 id="what"><a class="header" href="#what">What</a></h2>
+<p>Science is still at an early stage for computer energy consumption evaluation.</p>
+<p>Several approaches have been used to measure (or model) the power consumption of computers:</p>
+<ul>
+<li>
+<p>RAPL can be used on all recent Intel and AMD CPUs. Most energy consumption metrology agents use it to estimate CPU+RAM consumption which represents the majority of power consumption on most common servers (CPU, RAM, SSD or disk… no GPU). Its it not always possible to access RAPL data. It needs recent Linux kernel, recent hardware, and root access. And it needs a monitoring agent to log data frequently, because you cannot ask RAPL once a year what the consumption has been in the last year. Besides, in environment such as public cloud or VM you can not access RAPL interfaces.</p>
+</li>
+<li>
+<p>The IPMI (DCMI) can provide the power consumption of the power supply unit, but we don't know for sure how this metric is calculated. And access to DCMI seems to be very rare on public bare-metal hosters, so it is a metric we cannot get on every dedicated server.</p>
+</li>
+<li>
+<p><code>lm-sensors</code> can provide the ACPI power, but again it seems to be very rare, and we don't know how this metric is calculated, more search is needed.</p>
+</li>
+<li>
+<p>A PDU could provide the data, but most users do not have access to datacenters PDU.</p>
+</li>
+<li>
+<p>Wattmeters between the server and its power plug could provide the data, but obviously we don't have that on public baremetal servers.</p>
+</li>
+<li>
+<p>Model have been developed to retrieve consumption data from proxy metrics. They often use data from spec_power or from unormalized data collection process. Unfortunately, the level of granularity is often not fine enough to infer quality models.</p>
+</li>
+</ul>
+<p>These different methods give different result on the same environment. For instance, the first tests to compare RAPL measurements (CPU+RAM) to total power consumption (with DCMI or watt meter) seems to indicate that the global power can be between 1 and 10x what we get with RAPL (again, on standard dedicated server without GPU).</p>
+<p>So how do we bridge these gaps? Can we guess the total power based on RAPL only? Maybe add some fixed costs for hardware? Maybe we should add storage IOs? Network? Maybe temperature can help? How much precision can we get with partial information? How precisely can we estimate server yearly power consumption with only hardware specs and proxy metrics?</p>
+<p>Energizta is trying to address these problems and provide a set of tools to report and model the power consumption of servers <em>with as much precision as possible</em>.</p>
+<h2 id="how"><a class="header" href="#how">How?</a></h2>
+<ol>
+<li>With a script that collect hardware configurations and retreive power consumption metrics on baremetal servers at differents states with differents methods.</li>
+<li>With a &quot;citizen science&quot; database where anyone can contribute by uploading the information returned by the script. This database will be opendata and should allow research scientists to work on models and equations to describe power usage based upon hardware specs proxy metrics (realtime or average).</li>
+<li>With an API that will compile the result of the models and equations to provide power consumption estimation based upon what's available to the user given it's context.</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quickstart-for-energitas-contributers"><a class="header" href="#quickstart-for-energitas-contributers">Quickstart for energita's contributers</a></h1>
+<p>This page is dedicated to people who want to contribute quickly to the Energizta data repository. If you wish to understand the details of the project, please read the rest of the documentation</p>
+<pre><code class="language-bash">wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
+chmod +x energizta.sh
+sudo apt-get install awk sed curl lshw stress-ng
+
+sudo ./energizta.sh --stresstest --send-to-db
+</code></pre>
+<p>This will run a series of <a href="stress-test-mode.html">stress tests</a> while collecting power consumption data and then <a href="send-data.html">send the collected data to the energizta-db.boavizta.org database</a> with your consent. If your machine has not yet sent any data, energizta.sh will collect <a href="host-variables.html">a series of variables</a> to characterize the technical configuration of the host.</p>
+<pre><code class="language-ignore">-- 2023-03-03 18:13:46 - INFO: This test should take 240s
+-- 2023-03-03 18:13:46 - INFO: Running &quot;sleep 120&quot; for 60 seconds
+{&quot;host&quot;: &quot;d04e0818-3d98-41ad-b516-7b735809a0bf_1f9684433f690826ce392919c8022beb_82e8c7a4c323a6df478f95c0683fb084&quot;,&quot;interval_us&quot;: 6400207,&quot;duration_us&quot;: 51201667,&quot;nb_states&quot;: 8,&quot;cpu_iowait_pct&quot;: 0,&quot;cpu_sys_pct&quot;: 2,&quot;cpu_usr_pct&quot;: 97,&quot;load1&quot;: 11.61,&quot;mem_free_MB&quot;: 2099,&quot;mem_total_MB&quot;: 7708,&quot;mem_used_MB&quot;: 2339,&quot;sda_pct_busy&quot;: 4,&quot;sda_read_kBps&quot;: 1271,&quot;sda_write_kBps&quot;: 198,&quot;powers&quot;: {&quot;rapl_dram_0_watt&quot;: 1,&quot;rapl_package_0_watt&quot;: 8,&quot;rapl_total_watt&quot;: 9},&quot;energizta_version&quot;: &quot;0.1a&quot;}
+ 
+-- 2023-03-03 18:16:11 - INFO: Running &quot;stress-ng -q --cpu 4&quot; for 60 seconds
+1ad-b516-7b735809a0bf_1f9684433f690826ce392919c8022beb_82e8c7a4c323a6df478f95c0683fb084&quot;,&quot;interval_us&quot;: 6457377,&quot;duration_us&quot;: 51659033,&quot;nb_states&quot;: 8,&quot;cpu_iowait_pct&quot;: 0,&quot;cpu_sys_pct&quot;: 2,&quot;cpu_usr_pct&quot;: 97,&quot;load1&quot;: 13.35,&quot;mem_free_MB&quot;: 2133,&quot;mem_total_MB&quot;: 7708,&quot;mem_used_MB&quot;: 2317,&quot;sda_pct_busy&quot;: 0,&quot;sda_read_kBps&quot;: 3,&quot;sda_write_kBps&quot;: 202,&quot;powers&quot;: {&quot;rapl_dram_0_watt&quot;: 0,&quot;rapl_package_0_watt&quot;: 8,&quot;rapl_total_watt&quot;: 8},&quot;energizta_version&quot;: &quot;0.1a&quot;}
+
+... 
+
+-- 2023-03-03 18:21:24 - INFO: Running &quot;stress-ng -q --cpu 8&quot; for 60 seconds
+{&quot;host&quot;: &quot;d04e0818-3d98-41ad-b516-7b735809a0bf_1f9684433f690826ce392919c8022beb_82e8c7a4c323a6df478f95c0683fb084&quot;,&quot;interval_us&quot;: 6602975,&quot;duration_us&quot;: 52823821,&quot;nb_states&quot;: 8,&quot;cpu_iowait_pct&quot;: 0,&quot;cpu_sys_pct&quot;: 0,&quot;cpu_usr_pct&quot;: 99,&quot;load1&quot;: 17.32,&quot;mem_free_MB&quot;: 2076,&quot;mem_total_MB&quot;: 7708,&quot;mem_used_MB&quot;: 2330,&quot;sda_pct_busy&quot;: 0,&quot;sda_read_kBps&quot;: 104,&quot;sda_write_kBps&quot;: 139,&quot;powers&quot;: {&quot;rapl_dram_0_watt&quot;: 0,&quot;rapl_package_0_watt&quot;: 8,&quot;rapl_total_watt&quot;: 8},&quot;energizta_version&quot;: &quot;0.1a&quot;}
+ 
+=&gt; Do you still want to send above data to Boavizta's Energizta database? (y/n) y
+ 
+Checking if d04e0818-3d98-41ad-b516-7b735809a0bf_1f9684433f690826ce392919c8022beb_82e8c7a4c323a6df478f95c0683fb084 is registered in Boavizta's Energizta database…
+We need to register some information about your hardware and software.
+It should be completely anonymous:
+
+
+&quot;id&quot;: &quot;d04e0818-3d98-41ad-b516-7b735809a0bf_1f9684433f690826ce392919c8022beb_82e8c7a4c323a6df478f95c0683fb084&quot;,
+&quot;hardware&quot;: [
+...
+],
+&quot;software&quot;: {...}
+}
+
+=&gt; Do you allow to register this on Boavizta's Energizta database? (y/n) y
+
+Registering d04e0818-3d98-41ad-b516-7b735809a0bf_1f9684433f690826ce392919c8022beb_82e8c7a4c323a6df478f95c0683fb084 in Boavizta's Energizta database…
+This host is now registered.
+
+Sending results to Energizta collaborative database…
+
+Done. Thank you!
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="faq"><a class="header" href="#faq">FAQ</a></h1>
+<h3 id="shouldnt-this-be-done-at-another-level"><a class="header" href="#shouldnt-this-be-done-at-another-level">Shouldn't this be done at another level?</a></h3>
+<p>Yes, of course. Power usage should be provided by the datacenter or the hoster, and we believe (hope?) it will be, pretty soon, because the clients will start to ask for it.</p>
+<p>But for now, it's not. And even when it will be, how can you tell if the value you get seems to be right? Take the previous example: &quot;I have a server with an Intel Xeon E3-1240v6, 32GB RAM, 2 500GB SSD. I know last year it had a load average of 3.&quot; Can you guess the power consumption?
+Well, we have discussed. Some will tell 20W, some will tell 60W, some will tell 200W.</p>
+<p>We need to get a feeling for the numbers we are looking at and working with. And this project should at least get us there.</p>
+<h3 id="is-it-all-i-need-to-calculate-environmental-impacts"><a class="header" href="#is-it-all-i-need-to-calculate-environmental-impacts">Is it all I need to calculate environmental impacts?</a></h3>
+<p>No, of course not. This project will only help to measure or model the power consumption of a given server. To get to the impacts related to usage, you should add at least the datacenter P.U.E., and then look at the impacts of the energy mix of the location where the server run.</p>
+<p>But you should also include the other step of the lifecycle of servers such as raw material extraction, manufacture, transport and end of life.</p>
+<p>Finally, you should not only look at the green gas emissions but have a multi-criteria approach by taking into account other impacts such as abiotic depletion, water usage, ...</p>
+<h3 id="what-about-cloud-usage-what-about-vm-how-can-i-know-how-my-application-consume"><a class="header" href="#what-about-cloud-usage-what-about-vm-how-can-i-know-how-my-application-consume">What about cloud usage? What about VM? How can I know how my application consume?</a></h3>
+<p>This is a matter of allocations : How to allocate the impacts of a physical element (servers) to the different function it fulfills ? Since we only focus on a physical layer (servers) this question is out of the scope of the project.</p>
+<p>See our approach for cloud : https://doc.dev.api.boavizta.org/Explanations/devices/cloud/</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="setup-energiztash"><a class="header" href="#setup-energiztash">Setup energizta.sh</a></h1>
+<p><code>energizta.sh</code> is a simple script that focuses on retrieving every information that can be used to guess the power consumption of baremetal servers <em>with as much precision as possible</em></p>
+<p>It will try and find all power metrics available. Some are partial (RAPL), some should be global (DCMI, lm-sensors, PDU…) and some could even be inputed by a user looking at a wattmeter. The primary goal is to get all data possible for scientists to work on models.</p>
+<p>This first version has been written in Bash4 and does not depend on anything else. The goal is to provide a simple script that can be run by anyone on any recent Linux server.</p>
+<h2 id="how-to-install"><a class="header" href="#how-to-install">How to install</a></h2>
+<pre><code class="language-bash">wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
+chmod +x energizta.sh
+sudo apt-get install awk sed curl lshw
+</code></pre>
+<h2 id="how-to-use"><a class="header" href="#how-to-use">How to use</a></h2>
+<pre><code class="language-bash">./energizta.sh --help
+sudo ./energizta.sh
+</code></pre>
+<p>It will run until you use Ctrl+C to stop it.</p>
+<p><code>energizta.sh</code> gives you various options that are documented in <code>./energizta --help</code></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="main-options"><a class="header" href="#main-options">Main options</a></h1>
+<pre><code class="language-bash">--interval INTERVAL   Measure server state each INTERVAL seconds (default 5)
+--duration DURATION   Stop each stresstest after DURATION seconds (default 60)
+--once                Do not loop, print one state and exit
+--manual-input        Ask the user to enter power metrics manually (from a Wattmeter…)
+
+--debug               Display debug outputs
+--continuous          Display the current state every INTERVAL seconds instead of an average state every DURATION seconds
+--energy-only         Only displays energy variables instead of global state (load, cpu, etc.)
+--with_timestamp      Include timestamp in displayed variables
+--with_date           Include datetime in displayed variables
+--short-host-id       Use shorter string as HOST_ID and avoid the need for lshw (not compatible with --send-     to-db)
+--force-host-id ID    Force an alternative HOST_ID, use $(hostname) for instance (not compatible with --send-    to-db)
+
+</code></pre>
+<blockquote>
+<p>This script should not be used with an INTERVAL lower than 1 because each loop can take 500ms so it can cause significant load. Also, the greater the INTERVAL between each loop, the lower the margin of error on interval dependant measures (disk usage, RAPL power). With that said, some metrics are realtime metrics (temp, dcmi, used mem), so the greater the interval, the least those metrics are representative of the period. I believe a 2 to 10s INTERVAL is ideal.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="default-mode"><a class="header" href="#default-mode">Default mode</a></h1>
+<p>By default energizta.sh will collect and report metrics describing the current use of the machine on which it is installed</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="stress-test-mode"><a class="header" href="#stress-test-mode">Stress test mode</a></h1>
+<p>To get the most various data, Energizta can run stress tests to put your server in various load level. It will make your server work at 10%, 50%, 100%… and take measurement for each state.</p>
+<p>To do this we use https://github.com/ColinIanKing/stress-ng</p>
+<p>On Debian : <code>sudo apt-get install stress-ng</code></p>
+<pre><code class="language-bash">sudo ./energizta.sh --stresstest [--debug]
+</code></pre>
+<p>By default, it will run… TODO</p>
+<h3 id="alternate-stress-tests"><a class="header" href="#alternate-stress-tests">Alternate stress tests</a></h3>
+<p>If you want to run your own stress tests, you can do it by providing your own file. Each line of the file should be a stress test command that will run for at least DURATION seconds (because you don't want your stress test to stop before the measurements…). The command does not have to stop by itself, <code>energizta.sh</code> will kill it after DURATION seconds.</p>
+<pre><code class="language-bash">sudo ./energizta.sh --stressfile my_stress_tests.txt
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="about-the-host-variable"><a class="header" href="#about-the-host-variable">About the &quot;host&quot; variable</a></h1>
+<p>The &quot;host&quot; variable will be used in our database to group states by host, to study one host, or to exclude one host of the study.</p>
+<p>It is composed of 3 parts:</p>
+<ul>
+<li>the UUID of the <code>/</code> partition. This UUID will not change between runs and should be unique to your computer. But it is also completely anonymous and cannot be used to identify your computer on the internet. That's why we did not use the hostname of the mac address.</li>
+<li>the md5sum of the hardware : <code>lshw -short</code> (with some filtering)</li>
+<li>the md5sum of the software : <code>arch</code>, <code>uname -a</code> (minus hostname) and <code>lsb_release -ds</code></li>
+</ul>
+<p>The idea is that hardware and software upgrade can affect power consumption, so we need to group the states under a different ID.</p>
+<p>If you want a shorter id, or a custom id, you can use :</p>
+<pre><code class="language-bash">--short-host-id       Use shorter string as HOST_ID and avoid the need for lshw
+--force-host-id ID    Force an alternative HOST_ID, use $(hostname) for instance
+</code></pre>
+<p>These options are not compatible with <code>--send-to-db</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-send-us-your-results"><a class="header" href="#how-to-send-us-your-results">How to send us your results!</a></h1>
+<p>The main goal of this tool is to stresstest your computer or baremetal server, and send the results to Energizta collaborative database. It will also send the hardware and OS.</p>
+<pre><code class="language-bash">sudo ./energizta.sh --stresstest --send-to-db
+</code></pre>
+<p>The data sent to the collaborative database should be completely anonymous and should not be enough to identify your computer or server (no hostname, no IP, no MAC, etc.). The script will display and ask you for confirmation before sending data.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-run-in-the-background-with-systemd"><a class="header" href="#how-to-run-in-the-background-with-systemd">How to run in the background (with systemd)</a></h1>
+<p>First, move <code>energizta.sh</code> to <code>/usr/local/sbin/energizta.sh</code>.</p>
+<p>Then, create a new file <code>/etc/systemd/system/energizta.service</code></p>
+<pre><code class="language-bash">[Unit]
+Description=Energizta
+
+[Service]
+ExecStart=/usr/local/sbin/energizta.sh --interval 10 --duration 60 --short-host-id
+ExecStart=/bin/sh -c '/usr/local/sbin/energizta.sh --interval 10 --duration 60 --with-timestamp --with-date --short-host-id &gt;&gt; /var/lib/energizta/energizta.log'
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>Then activate and run the service</p>
+<pre><code class="language-bash">systemctl daemon-reload
+systemctl enable energizta
+systemctl start energizta
+tail -f /var/log/energizta.log
+</code></pre>
+<p>Please be aware that <code>energizta.sh</code> outputs JSON lines that can take a lot of space overtime. You should use <code>--duration</code> set the duration between each log (60s by default). And you should configure logrotate accordingly.</p>
+<blockquote>
+<p>Also be aware that due to the current implementation, <code>energizta.sh</code> ends up having a load of variables after a few days which can cause significative load. You should restart this daemon at least once a day.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="questions-to-be-answered"><a class="header" href="#questions-to-be-answered">Questions to be answered</a></h1>
+<p>To help you understand how to use the data collected in energizta, here is a list of questions we would like to answer.</p>
+<ul>
+<li>
+<p>I have a server with an Intel Xeon E3-1240v6, 32GB RAM, 2 500GB SSD. I know last year it had a load average of 3. Can we tell how much energy it has consume? With what precision? Looking at existing data for similar hardware, we should at least be able to provide a minimum and a maximum power consumption. <a href="https://doc.api.boavizta.org/Explanations/consumption_profile/">See Boaviztapi's consumption profile for more information on this use case</a></p>
+</li>
+<li>
+<p>I am running a metrology agent on the same server (Xeon…, 32GB RAM… etc.). RAPL tells me that right now I have 14W in the CPU+RAM, I have a load1 of 3, 14%cpu_user, 10%cpu_sys, 0%cpu_iowait, 5GB RAM used, etc… but I don't have access to IPMI. Can we tell the global power usage? Again, with what precision?</p>
+</li>
+<li>
+<p>I have an AWS EC2 a1.medium instance. I know my average cpu load from AWS API. Looking at existing data for similar hardware, we should at least be able to provide a minimum and a maximum power consumption. <a href="https://boavizta.github.io/cloud-scanner/intro.html">See cloud-scanner for more information on this use-case</a></p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="datapipeline"><a class="header" href="#datapipeline">Datapipeline</a></h1>
+<p>In progress...</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+    </body>
+</html>
