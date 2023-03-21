@@ -4,6 +4,8 @@ Energizta is a collaborative project to collect and report open-data on the ener
 
 **Warning: this is still a very early stage project. Any feedback or contribution will be highly appreciated.**
 
+![principle of Energizta](images/principle.excalidraw.png "Principle of Energizta")
+
 ## What
 
 Science is still at an early stage for computer energy consumption evaluation.
