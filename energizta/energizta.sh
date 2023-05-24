@@ -369,6 +369,8 @@ compute_state() {
                 name=dram_$i
             elif [[ "$name" == package* ]]; then
                 name=package_$i
+            elif [[ "$name" == psys ]]; then
+                name=psys_$i
             else
                 # For now we only manage package-X and dram
                 continue
@@ -386,8 +388,12 @@ compute_state() {
 
                 (( state[_rapl_total_delta_energy_uj]+=delta_uj ))
                 state[rapl_${name}_watt]=$((delta_uj / (interval_us)))
-                state[rapl_total_watt]=$((state[rapl_total_watt] + (delta_uj / (interval_us))))
-                state[_rapl_nb_src]=$((state[rapl_nb_src] + 1))
+                if ! [[ "$name" == psys_* ]]; then
+                    state[rapl_total_watt]=$((state[rapl_total_watt] + (delta_uj / (interval_us))))
+                    state[_rapl_nb_src]=$((state[_rapl_nb_src] + 1))
+                else
+                    state[rapl_totalpsys_watt]=$((state[rapl_totalpsys_watt] + (delta_uj / (interval_us))))
+                fi
             fi
 
         done
