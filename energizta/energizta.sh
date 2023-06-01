@@ -344,6 +344,22 @@ compute_state() {
                 fi
             done
         fi
+
+        # Netstats
+        NETSTAT=$(cat /proc/net/dev)
+        for netint in /sys/class/net/*/device; do
+            netint=$(echo "$netint" | cut -d '/' -f 5)
+            state[_${netint}_bytes_recv]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $2}')
+            state[_${netint}_packets_recv]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $3}')
+            state[_${netint}_bytes_sent]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $10}')
+            state[_${netint}_packets_sent]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $11}')
+            if [ "$interval_s" -gt 0 ]; then
+                state[${netint}_recv_kBps]=$(((${state[_${netint}_bytes_recv]} - ${last_state[_${netint}_bytes_recv]}) / interval_s / 1024))
+                state[${netint}_sent_kBps]=$(((${state[_${netint}_bytes_sent]} - ${last_state[_${netint}_bytes_sent]}) / interval_s / 1024))
+                state[${netint}_recv_packetsps]=$(((${state[_${netint}_packets_recv]} - ${last_state[_${netint}_packets_recv]}) / interval_s))
+                state[${netint}_sent_packetsps]=$(((${state[_${netint}_packets_sent]} - ${last_state[_${netint}_packets_sent]}) / interval_s))
+            fi
+        done
     fi
 
     # Sensors
@@ -448,7 +464,7 @@ print_state() {
     [ -n "${state[duration_us]}" ] && echo "\"duration_us\": ${state[duration_us]},"
     [ -n "${state[nb_states]}" ] && echo "\"nb_states\": ${state[nb_states]},"
     for j in "${!state[@]}"; do
-        if [[ ! "$j" == _* ]] && [[ $j =~ ([a-z0-9]_(pct_busy|read_kBps|write_kBps)|cpu_[a-z_]|mem_[a-z_]|load1|sensors_coretemp) ]]; then
+        if [[ ! "$j" == _* ]] && [[ $j =~ ([a-z0-9]_(pct_busy|read_kBps|write_kBps|recv_kBps|sent_kBps|recv_packetsps|sent_packetsps)|cpu_[a-z_]|mem_[a-z_]|load1|sensors_coretemp) ]]; then
             echo "\"$j\": ${state[$j]}",
         fi
     done | sort
