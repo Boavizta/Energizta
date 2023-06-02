@@ -349,10 +349,10 @@ compute_state() {
         NETSTAT=$(cat /proc/net/dev)
         for netint in /sys/class/net/*/device; do
             netint=$(echo "$netint" | cut -d '/' -f 5)
-            state[_${netint}_bytes_recv]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $2}')
-            state[_${netint}_packets_recv]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $3}')
-            state[_${netint}_bytes_sent]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $10}')
-            state[_${netint}_packets_sent]=$(echo "$NETSTAT" | grep "$netint" | awk '{print $11}')
+            state[_${netint}_bytes_recv]=$(echo "$NETSTAT" | grep "$netint:" | awk '{print $2}')
+            state[_${netint}_packets_recv]=$(echo "$NETSTAT" | grep "$netint:" | awk '{print $3}')
+            state[_${netint}_bytes_sent]=$(echo "$NETSTAT" | grep "$netint:" | awk '{print $10}')
+            state[_${netint}_packets_sent]=$(echo "$NETSTAT" | grep "$netint:" | awk '{print $11}')
             if [ "$interval_s" -gt 0 ]; then
                 state[${netint}_recv_kBps]=$(((${state[_${netint}_bytes_recv]} - ${last_state[_${netint}_bytes_recv]}) / interval_s / 1024))
                 state[${netint}_sent_kBps]=$(((${state[_${netint}_bytes_sent]} - ${last_state[_${netint}_bytes_sent]}) / interval_s / 1024))
