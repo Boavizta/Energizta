@@ -4,6 +4,8 @@ Energizta is a collaborative project to collect and report open-data on the ener
 
 **:warning: This is still a very early stage project. Any feedback or contribution will be highly appreciated. :warning:**
 
+![principle of Energizta](docs/src/images/principle.excalidraw.png "Principle of Energizta")
+
 ## What ❔
 
 Science is still at an early stage for computer energy consumption evaluation. Several approaches have been used to measure (or model) the power consumption of computers (RAPL, IPMI, PDU, Models, Energy consumption metrology agents, Wattmeter, ...). These different methods have limitations in terms of completeness, confidence or implementability. Besides they often give different result on the same environment. 
