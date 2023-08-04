@@ -40,7 +40,7 @@
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 
 
-VERSION="0.1"
+VERSION="0.2"
 ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
