@@ -292,6 +292,7 @@ compute_state() {
         state[energizta_version]="$VERSION"
 
         state[load1]=$(cut -d ' ' -f 1 < /proc/loadavg)
+        state[cpu_freq_mhz]=$(grep "^cpu MHz" /proc/cpuinfo | awk '{x+=$4} END {printf "%.0f\n", x/NR}')
 
         # Procstat
         if [ -f "/proc/stat" ]; then
