@@ -23,6 +23,10 @@
 ###   --short-host-id       Use shorter string as HOST_ID and avoid the need for lshw (not compatible with --send-to-db)
 ###   --force-host-id ID    Force an alternative HOST_ID, use $(hostname) for instance (not compatible with --send-to-db)
 ###
+### Wattmeter sources:
+###   --ipmi-sensor-id ID   Name of sensor to get power from in `ipmitool sensor`
+###   --shellyplug-url URL  Shelly Plug URL (ex: http://192.168.33.1 or http://admin:password@192.168.33)
+###
 ### Misc options :
 ###   --force-without-root  Force the script to run with current user
 ###   --help                Display this help
@@ -40,7 +44,7 @@
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 
 
-VERSION="0.2"
+VERSION="0.3"
 ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
@@ -98,6 +102,7 @@ while [ -n "$1" ]; do
         --once) ONCE=true ;;
         --manual-input) MANUAL_INPUT=true ;;
         --ipmi-sensor-id) shift; IPMI_SENSOR_ID=$1 ;;
+        --shellyplug-url) shift; SHELLYPLUG_URL=$1 ;;
 
         --stresstest) STRESSTEST=true ;;
         --stressfile) shift; STRESSTEST=true; STRESSFILE=$1 ;;
@@ -200,6 +205,13 @@ if ! $DCMI && [ -z "$IPMI_SENSOR_ID" ]; then
 fi
 
 IPMI_SENSOR_NAME=$(echo "$IPMI_SENSOR_ID" | tr '[:upper:]' '[:lower:]' | sed 's/ /_/g')
+
+if [ -n "$SHELLYPLUG_URL" ]; then
+    if [ -z "$(curl -s -X GET "$SHELLYPLUG_URL/status" | jq -r '.meters[0].power')" ]; then
+        >&2 echo "Could not find power in ShellyPlug. Please check ShellyPlug URL."
+        exit 1
+    fi
+fi
 
 if $STRESSTEST && $ONCE; then
     >&2 echo "You cannot use --once and --stresstest together."
@@ -435,6 +447,15 @@ compute_state() {
 
     state_string=$(declare -p state)
     eval "declare -gA last_state=${state_string#*=}"
+
+    # Shellyplug
+    if [ -n "$SHELLYPLUG_URL" ]; then
+        shellyplug_watt="$(curl -s -X GET "$SHELLYPLUG_URL/status" | jq -r '.meters[0].power')"
+        if [ -n "$shellyplug_watt" ]; then
+            # shellcheck disable=SC2154
+            state['shellyplug_watt']=$(echo "$shellyplug_watt" | xargs printf "%.*f\n" "$p") # Round to integer
+        fi
+    fi
 }
 
 get_manual_input() {

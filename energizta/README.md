@@ -43,6 +43,9 @@ It will run until you use Ctrl+C to stop it.
 --short-host-id       Use shorter string as HOST_ID and avoid the need for lshw (not compatible with --send-     to-db)
 --force-host-id ID    Force an alternative HOST_ID, use $(hostname) for instance (not compatible with --send-    to-db)
 
+--ipmi-sensor-id ID   Name of sensor to get power from in `ipmitool sensor`
+--shellyplug-url URL  Shelly Plug URL (ex: http://192.168.33.1 or http://admin:password@192.168.33)
+
 --stresstest          Run a stresstest
 --stressfile FILEPATH Load alternative stress tests commands from a file instead of default stresstest
 --warmup WARMUP       Wait WARMUP seconds after lauching a stresstest before measuring state (default 20)

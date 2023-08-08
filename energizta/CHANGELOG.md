@@ -1,5 +1,11 @@
 # Changelog
 
+## energizta.sh 0.3
+
+**Features**
+
+* Manage Shelly Plug Smart Plug / Wattmeter (tested with Shelly Plug S)
+
 ## energizta.sh 0.2
 
 **Features**
