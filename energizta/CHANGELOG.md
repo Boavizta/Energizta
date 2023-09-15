@@ -1,5 +1,11 @@
 # Changelog
 
+## energizta.sh 0.4
+
+**Improvements*
+
+* Improve int divisions to avoid rounding to inferior integer, which could compound to more than 1W error.
+
 ## energizta.sh 0.3
 
 **Features**

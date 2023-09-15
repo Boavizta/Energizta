@@ -44,7 +44,7 @@
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 
 
-VERSION="0.3"
+VERSION="0.4"
 ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
@@ -259,6 +259,13 @@ declare -gA state
 declare -gA avg_state
 declare -gA last_state
 
+calc_int () {
+    # shellcheck disable=SC2005
+    # shellcheck disable=SC2016
+    # shellcheck disable=SC2086
+    #echo "$(printf "%.0f" "$(echo "scale=2;$1" | bc)")"
+    awk  "BEGIN { rounded = sprintf(\"%.0f\", $1); print rounded }"
+}
 
 compute_avg_state() {
     if [ -z "${avg_state[nb_states]}" ]; then
@@ -271,8 +278,7 @@ compute_avg_state() {
             if [ -z "${avg_state[$j]}" ]; then
                 avg_state[$j]=${state[$j]}
             else
-                # :TODO:maethor:20221027: I think float manipulation could be better
-                avg_state[$j]=$(echo "${avg_state[$j]} + ((${state[$j]} - ${avg_state[$j]}) / ${avg_state[nb_states]})" | bc)
+                avg_state[$j]=$(calc_int "${avg_state[$j]} + ((${state[$j]} - ${avg_state[$j]}) / ${avg_state[nb_states]})")
             fi
         fi
     done
@@ -293,7 +299,7 @@ compute_state() {
     else
         interval_us=0
     fi
-    interval_s=$((interval_us / 1000000))
+    interval_s=$(calc_int "$interval_us / 1000000")
     state[interval_us]=$interval_us
     state[_interval_s]=$interval_s
     $WITH_TIMESTAMP && state[timestamp]=$(date +%s)
@@ -319,9 +325,9 @@ compute_state() {
                 cpu_sys=$((state[_cpu_sys] - last_state[_cpu_sys]))
                 cpu_iowait=$((state[_cpu_iowait] - last_state[_cpu_iowait]))
                 cpu_total=$((cpu_idle+cpu_usr+cpu_sys+cpu_iowait))
-                state[cpu_usr_pct]=$(((cpu_usr*100)/cpu_total))
-                state[cpu_sys_pct]=$(((cpu_sys*100)/cpu_total))
-                state[cpu_iowait_pct]=$(((cpu_iowait*100)/cpu_total))
+                state[cpu_usr_pct]=$(calc_int "($cpu_usr*100)/ $cpu_total")
+                state[cpu_sys_pct]=$(calc_int "($cpu_sys*100) / $cpu_total")
+                state[cpu_iowait_pct]=$(calc_int "($cpu_iowait*100) / $cpu_total")
             fi
         fi
 
@@ -352,7 +358,7 @@ compute_state() {
                         state[${dev}_read_kBps]=$(((${state[_${dev}_sectors_read]} - ${last_state[_${dev}_sectors_read]}) * SECTOR_SIZE_BYTE / interval_s / 1024))
                         state[${dev}_write_kBps]=$(((${state[_${dev}_sectors_write]} - ${last_state[_${dev}_sectors_write]}) * SECTOR_SIZE_BYTE / interval_s / 1024))
                         state[_${dev}_delta_time_io_ms]=$((${state[_${dev}_time_io_ms]} - ${last_state[_${dev}_time_io_ms]}))
-                        state[${dev}_pct_busy]=$((100 * ${state[_${dev}_delta_time_io_ms]} / (interval_us / 1000)))
+                        state[${dev}_pct_busy]=$(calc_int "100 * ${state[_${dev}_delta_time_io_ms]} / ($interval_us / 1000)")
                     fi
                 fi
             done
@@ -416,12 +422,13 @@ compute_state() {
                 fi
 
                 (( state[_rapl_total_delta_energy_uj]+=delta_uj ))
-                state[rapl_${name}_watt]=$((delta_uj / (interval_us)))
+                rapl_watt=$(calc_int "$delta_uj / $interval_us")
+                state[rapl_${name}_watt]=$rapl_watt
                 if ! [[ "$name" == psys_* ]]; then
-                    state[rapl_total_watt]=$((state[rapl_total_watt] + (delta_uj / (interval_us))))
+                    state[rapl_total_watt]=$((state[rapl_total_watt] + rapl_watt))
                     state[_rapl_nb_src]=$((state[_rapl_nb_src] + 1))
                 else
-                    state[rapl_totalpsys_watt]=$((state[rapl_totalpsys_watt] + (delta_uj / (interval_us))))
+                    state[rapl_totalpsys_watt]=$((state[rapl_totalpsys_watt] + rapl_watt))
                 fi
             fi
 
@@ -460,7 +467,7 @@ compute_state() {
 
 get_manual_input() {
     if $MANUAL_INPUT; then
-        read -rp "Enter the average power in Watt for the last $((state[interval_us] / 1000000)) seconds (int or float, in Watt): " input </dev/tty 2>/dev/tty
+        read -rp "Enter the average power in Watt for the last $(calc_int "${state[interval_us]} / 1000000") seconds (int or float, in Watt): " input </dev/tty 2>/dev/tty
         while ! [[ $input =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]; do
             read -rp "\"$input\" is not an int or a float: " input </dev/tty 2>/dev/tty
         done
