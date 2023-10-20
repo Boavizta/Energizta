@@ -1,5 +1,11 @@
 # Changelog
 
+## energizta.sh 0.5
+
+**Features**
+
+* Manage Grid5000 wattemeter using Grid5000 API and $OAR_JOB_ID variable (#23, thank you @jacquetpi:tab)
+
 ## energizta.sh 0.4
 
 **Improvements*

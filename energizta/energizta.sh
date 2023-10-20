@@ -45,7 +45,7 @@
 # - Allow to have an "additionnal facts" option to run a script that will get more facts
 
 
-VERSION="0.4"
+VERSION="0.5"
 ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
@@ -477,6 +477,7 @@ compute_state() {
 
     # Grid5000
     if $G5K; then
+        # We can use jq here because it is installed by default on Grid5000 servers
         g5k_since=$(date -d "$INTERVAL sec ago" +%s)
         g5k_req="https://api.grid5000.fr/stable/sites/$(head -n 1 "/var/lib/oar/$OAR_JOB_ID" |  cut -f2 -d".")/metrics?job_id=$OAR_JOB_ID&metrics=wattmetre_power_watt&start_time=$g5k_since"
         g5k_watt_raw=$(curl -s -X GET "$g5k_req" | jq -r '.[] | .value')
