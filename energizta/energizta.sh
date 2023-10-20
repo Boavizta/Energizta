@@ -217,8 +217,8 @@ if [ -n "$SHELLYPLUG_URL" ]; then
 fi
 
 if $G5K; then
-    g5k_req="https://api.grid5000.fr/stable/sites/$(head -n 1 /var/lib/oar/$OAR_JOB_ID |  cut -f2 -d".")/metrics?job_id=$OAR_JOB_ID&metrics=wattmetre_power_watt&start_time=$(date -d '5 sec ago' +%s)"
-    if [ -z "$(curl -s -X GET $g5k_req | jq -r '.[-1] | .value')" ]; then
+    g5k_req="https://api.grid5000.fr/stable/sites/$(head -n 1 "/var/lib/oar/$OAR_JOB_ID" |  cut -f2 -d".")/metrics?job_id=$OAR_JOB_ID&metrics=wattmetre_power_watt&start_time=$(date -d '5 sec ago' +%s)"
+    if [ -z "$(curl -s -X GET "$g5k_req" | jq -r '.[-1] | .value')" ]; then
         >&2 echo "Could not find Grid5000 wattmeter. Are you on a G5k server equipped with a wattmeter?"
         exit 1
     fi
@@ -478,12 +478,12 @@ compute_state() {
     # Grid5000
     if $G5K; then
         g5k_since=$(date -d "$INTERVAL sec ago" +%s)
-        g5k_req="https://api.grid5000.fr/stable/sites/$(head -n 1 /var/lib/oar/$OAR_JOB_ID |  cut -f2 -d".")/metrics?job_id=$OAR_JOB_ID&metrics=wattmetre_power_watt&start_time=$g5k_since"
-        g5k_watt_raw=$(curl -s -X GET $g5k_req | jq -r '.[] | .value')
+        g5k_req="https://api.grid5000.fr/stable/sites/$(head -n 1 "/var/lib/oar/$OAR_JOB_ID" |  cut -f2 -d".")/metrics?job_id=$OAR_JOB_ID&metrics=wattmetre_power_watt&start_time=$g5k_since"
+        g5k_watt_raw=$(curl -s -X GET "$g5k_req" | jq -r '.[] | .value')
         if [ -n "$g5k_watt_raw" ]; then
-            sum=$(echo $g5k_watt_raw | jq -s 'add')
-            count=$(echo $g5k_watt_raw | jq -s 'length')
-            state['g5k_watt']=$(bc <<< "scale=0; $sum/$count")
+            g5k_watt_sum=$(echo "$g5k_watt_raw" | jq -s 'add')
+            g5k_watt_count=$(echo "$g5k_watt_raw" | jq -s 'length')
+            state['g5k_watt']=$(calc_int "$g5k_watt_sum/$g5k_watt_count")
         fi
     fi
 }
