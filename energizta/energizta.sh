@@ -13,6 +13,7 @@
 ###   --stressfile FILEPATH Load alternative stress tests commands from a file instead of default stresstest
 ###   --warmup WARMUP       Wait WARMUP seconds after lauching a stresstest before measuring state (default 20)
 ###   --send-to-db          Send the stresstest results to Boavizta's Energizta collaborative database
+###   --no-interactive      When sending stresstest results, do not prompt for confirmation (useful in non-interactive environments)
 ###
 ### Display options:
 ###   --debug               Display debug outputs
@@ -92,6 +93,7 @@ WITH_TIMESTAMP=false
 WITH_DATE=false
 REGISTER_ON_DB=false
 SEND_TO_DB=false
+DB_CONFIRM=true
 G5K=false
 HOST_ID=""
 #MACHINE_ID=$(cat /etc/machine-id) # Can change at every reboot?
@@ -112,6 +114,7 @@ while [ -n "$1" ]; do
         --warmup) shift; WARMUP=$1 ;;
 
         --send-to-db) SEND_TO_DB=true; REGISTER_ON_DB=true ;;
+        --no-interactive ) DB_CONFIRM=false ;;
         --short-host-id) HOST_ID=$MACHINE_ID ;;
         --force-host-id) shift; HOST_ID=$1 ;;
 
@@ -631,19 +634,22 @@ set +e
 # - and send the results of the run
 if $SEND_TO_DB; then
     echo ""
-    while true; do
-        read -rp "=> Do you still want to send above data to Boavizta's Energizta database? (y/n) " yn
-        echo ""
-        case $yn in
-            [Yy]* ) break;;
-            [Nn]* )
-                echo "If you change your mind you can still try to send it with this command:"
-                echo "curl --upload-file $TMPFILE $ENERGIZTA_DB_URL/pub/states"
-                exit
-                ;;
-            * ) echo "Please answer yes or no.";;
-        esac
-    done
+
+    if $DB_CONFIRM; then
+        while true; do
+            read -rp "=> Do you still want to send above data to Boavizta's Energizta database? (y/n) " yn
+            echo ""
+            case $yn in
+                [Yy]* ) break;;
+                [Nn]* )
+                    echo "If you change your mind you can still try to send it with this command:"
+                    echo "curl --upload-file $TMPFILE $ENERGIZTA_DB_URL/pub/states"
+                    exit
+                    ;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+    fi
 
     echo "Checking if $HOST_ID is registered in Boavizta's Energizta database…"
     case "$(curl "$ENERGIZTA_DB_URL/pub/test_host/$HOST_ID" 2> /dev/null)" in
@@ -655,15 +661,17 @@ if $SEND_TO_DB; then
             echo "It should be completely anonymous:"
             echo "$HOST"
 
-            while true; do
-                read -rp "=> Do you allow to register this on Boavizta's Energizta database? (y/n) " yn
-                echo ""
-                case $yn in
-                    [Yy]* ) break;;
-                    [Nn]* ) echo "OK Bye."; exit;; # :TODO:maethor:20230227: If you change your mind…
-                    * ) echo "Please answer yes or no.";;
-                esac
-            done
+            if $DB_CONFIRM; then 
+                while true; do
+                    read -rp "=> Do you allow to register this on Boavizta's Energizta database? (y/n) " yn
+                    echo ""
+                    case $yn in
+                        [Yy]* ) break;;
+                        [Nn]* ) echo "OK Bye."; exit;; # :TODO:maethor:20230227: If you change your mind…
+                        * ) echo "Please answer yes or no.";;
+                    esac
+                done
+            fi
 
             echo "Registering $HOST_ID in Boavizta's Energizta database…"
             ret_code="$(curl -s -o /dev/stderr --write-out '%{response_code}' -X POST --header 'content-type: application/json' --data "$HOST" "$ENERGIZTA_DB_URL/pub/host")"
