@@ -26,6 +26,7 @@
 ### Wattmeter sources:
 ###   --ipmi-sensor-id ID   Name of sensor to get power from in `ipmitool sensor`
 ###   --shellyplug-url URL  Shelly Plug URL (ex: http://192.168.33.1 or http://admin:password@192.168.33)
+###   --grid5000            Connect to Grid5000 API using OAR variables to retrieve related wattmeter
 ###
 ### Misc options :
 ###   --force-without-root  Force the script to run with current user
@@ -91,6 +92,7 @@ WITH_TIMESTAMP=false
 WITH_DATE=false
 REGISTER_ON_DB=false
 SEND_TO_DB=false
+G5K=false
 HOST_ID=""
 #MACHINE_ID=$(cat /etc/machine-id) # Can change at every reboot?
 MACHINE_ID=$(lsblk -o UUID,MOUNTPOINT 2>/dev/null | grep ' /$' -m 1 | cut -d ' ' -f 1)
@@ -103,6 +105,7 @@ while [ -n "$1" ]; do
         --manual-input) MANUAL_INPUT=true ;;
         --ipmi-sensor-id) shift; IPMI_SENSOR_ID=$1 ;;
         --shellyplug-url) shift; SHELLYPLUG_URL=$1 ;;
+        --grid5000) G5K=true ;;
 
         --stresstest) STRESSTEST=true ;;
         --stressfile) shift; STRESSTEST=true; STRESSFILE=$1 ;;
@@ -209,6 +212,14 @@ IPMI_SENSOR_NAME=$(echo "$IPMI_SENSOR_ID" | tr '[:upper:]' '[:lower:]' | sed 's/
 if [ -n "$SHELLYPLUG_URL" ]; then
     if [ -z "$(curl -s -X GET "$SHELLYPLUG_URL/status" | jq -r '.meters[0].power')" ]; then
         >&2 echo "Could not find power in ShellyPlug. Please check ShellyPlug URL."
+        exit 1
+    fi
+fi
+
+if $G5K; then
+    g5k_req="https://api.grid5000.fr/stable/sites/$(head -n 1 /var/lib/oar/$OAR_JOB_ID |  cut -f2 -d".")/metrics?job_id=$OAR_JOB_ID&metrics=wattmetre_power_watt&start_time=$(date -d '5 sec ago' +%s)"
+    if [ -z "$(curl -s -X GET $g5k_req | jq -r '.[-1] | .value')" ]; then
+        >&2 echo "Could not find Grid5000 wattmeter. Are you on a G5k server equipped with a wattmeter?"
         exit 1
     fi
 fi
@@ -461,6 +472,18 @@ compute_state() {
         if [ -n "$shellyplug_watt" ]; then
             # shellcheck disable=SC2154
             state['shellyplug_watt']=$(echo "$shellyplug_watt" | xargs printf "%.*f\n" "$p") # Round to integer
+        fi
+    fi
+
+    # Grid5000
+    if $G5K; then
+        g5k_since=$(date -d "$INTERVAL sec ago" +%s)
+        g5k_req="https://api.grid5000.fr/stable/sites/$(head -n 1 /var/lib/oar/$OAR_JOB_ID |  cut -f2 -d".")/metrics?job_id=$OAR_JOB_ID&metrics=wattmetre_power_watt&start_time=$g5k_since"
+        g5k_watt_raw=$(curl -s -X GET $g5k_req | jq -r '.[] | .value')
+        if [ -n "$g5k_watt_raw" ]; then
+            sum=$(echo $g5k_watt_raw | jq -s 'add')
+            count=$(echo $g5k_watt_raw | jq -s 'length')
+            state['g5k_watt']=$(bc <<< "scale=0; $sum/$count")
         fi
     fi
 }
