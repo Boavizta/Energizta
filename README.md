@@ -1,6 +1,12 @@
-# Energizta :electric_plug:
+<p align="center">
+    <img src="https://github.com/Boavizta/Energizta/blob/main/energizta_color.svg" height="100">
+</p>
 
-Energizta is a collaborative project to collect and report open-data on the energy consumption of servers.
+<h3 align="center">
+    Energizta is a collaborative project to collect and report open-data on the energy consumption of servers.
+</h3>
+
+---
 
 **:warning: This is still a very early stage project. Any feedback or contribution will be highly appreciated. :warning:**
 
