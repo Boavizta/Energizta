@@ -47,7 +47,10 @@
 
 
 VERSION="0.5"
-ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
+
+if ! [[ -v ENERGIZTA_DB_URL ]]; then
+  ENERGIZTA_DB_URL="https://energizta-db.boavizta.org"
+fi
 
 if ! ((BASH_VERSINFO[0] >= 4)); then
     >&2 echo "This script needs to be run with bash >= 4."

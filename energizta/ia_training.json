@@ -1,0 +1,65 @@
+{
+    "$schema": "../schema.json",
+    "experiment": {
+        "type": "ia_training",
+        "description": "Example of IA training",
+        "details": {
+            "task": {
+                "taskType": "supervisedLearning",
+                "taskFamily": "classification",
+                "taskStage": "training",
+                "algorithms": [
+                    {
+                        "algorithmName": "randomForest"
+                    }
+                ],
+                "dataset": [
+                    {
+                        "dataType": "tabular",
+                        "fileType": "csv",
+                        "volume": 80,
+                        "volumeUnit": "megabyte",
+                        "items": 150000,
+                        "shape": [
+                            20,
+                            150000
+                        ],
+                        "source": "private"
+                    }
+                ],
+                "measuredAccuracy": 0.71
+            }
+        }
+    },
+    "software_spec": {
+        "os_name": "Linux",
+        "os_version": "6.8.0-48-generic",
+        "os_friendly_name": "Ubuntu 22.04.5 LTS"
+    },
+    "hardware_spec": [
+        {
+            "kind": "cpu",
+            "model": "Intel(R) Core(TM) i5-10310U CPU @ 1.70GHz",
+            "vendor": "Intel",
+            "details": {}
+        }
+    ],
+    "measurements": [
+        {
+            "meta": {
+                "kind": "Energy",
+                "unit": "J",
+                "tool_name": "Alumet",
+                "tool_version": "0.6.1"
+            },
+            "hardware_component_kind": "cpu",
+            "hardware_component_id": "0",
+            "timestamp_begin": "2024-11-15 16:38:43+01:00",
+            "timestamp_end": "2024-11-15 16:38:44+01:00",
+            "value": 15,
+            "details": {
+                "rapl_domain": "psys"
+            }
+        }
+    ]
+}
