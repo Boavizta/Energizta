@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EnergiztaReport",
+  "type": "object",
+  "required": [
+    "experiment",
+    "hardware_spec",
+    "measurements",
+    "software_spec"
+  ],
+  "properties": {
+    "experiment": {
+      "$ref": "#/definitions/ExperimentInfo"
+    },
+    "hardware_spec": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/HardwareComponent"
+      }
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Measurement"
+      }
+    },
+    "software_spec": {
+      "$ref": "#/definitions/SoftwareSpec"
+    }
+  },
+  "definitions": {
+    "ExperimentInfo": {
+      "type": "object",
+      "required": [
+        "description",
+        "type"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "details": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": true
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "HardwareComponent": {
+      "type": "object",
+      "required": [
+        "details",
+        "kind",
+        "model",
+        "vendor"
+      ],
+      "properties": {
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "kind": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        }
+      }
+    },
+    "Measurement": {
+      "type": "object",
+      "required": [
+        "details",
+        "hardware_component_id",
+        "hardware_component_kind",
+        "meta",
+        "timestamp_begin",
+        "timestamp_end",
+        "value"
+      ],
+      "properties": {
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/MeasurementDetail"
+          }
+        },
+        "hardware_component_id": {
+          "type": "string"
+        },
+        "hardware_component_kind": {
+          "type": "string"
+        },
+        "meta": {
+          "$ref": "#/definitions/MeasurementMeta"
+        },
+        "timestamp_begin": {
+          "type": "string"
+        },
+        "timestamp_end": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "MeasurementDetail": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "type": "number",
+          "format": "double"
+        }
+      ]
+    },
+    "MeasurementKind": {
+      "type": "string",
+      "enum": [
+        "Performance",
+        "Energy",
+        "Other"
+      ]
+    },
+    "MeasurementMeta": {
+      "type": "object",
+      "required": [
+        "kind",
+        "tool_name",
+        "tool_version",
+        "unit"
+      ],
+      "properties": {
+        "error_margin": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "$comment": "optional error margin, in absolute value or percentage (include a % suffix in that case)"
+        },
+        "kind": {
+          "$ref": "#/definitions/MeasurementKind"
+        },
+        "tool_details": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tool_name": {
+          "type": "string"
+        },
+        "tool_version": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        }
+      }
+    },
+    "SoftwareSpec": {
+      "type": "object",
+      "required": [
+        "os_friendly_name",
+        "os_name",
+        "os_version"
+      ],
+      "properties": {
+        "os_friendly_name": {
+          "description": "For example `Ubuntu 22.04.4`.",
+          "type": "string"
+        },
+        "os_name": {
+          "description": "For example `Linux`.",
+          "type": "string"
+        },
+        "os_version": {
+          "description": "For example `6.8.0-48-generic`.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

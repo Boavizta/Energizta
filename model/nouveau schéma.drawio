@@ -1,0 +1,61 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17">
+  <diagram name="Page-1" id="E-mwSdPWWLFYrtegAUSl">
+    <mxGraphModel dx="2643" dy="581" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--1" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-788" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--2" value="outil tiers" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="-748" y="310" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--3" value="Mesure&lt;br&gt;(monitoring continu ou&lt;br&gt;mesure ponctuelle sur 1 expérience)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="-838" y="363" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--5" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-688" y="329.5" as="sourcePoint" />
+            <mxPoint x="-610" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--6" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="-598" y="231" width="130" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--7" value="Métadonnées" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-588" y="241" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--8" value="Spec hard/soft" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-588" y="301" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--9" value="Mesures&lt;br&gt;(séries temporelles)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-588" y="361" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--10" value="Rapport" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="-568" y="426" width="70" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--12" value="Energizta Server" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="-368" y="291" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--13" value="DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="-144" y="286" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--15" value="&lt;font color=&quot;#ff0000&quot;&gt;UUID généré à la volée&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-230" y="343" width="60" height="49" as="geometry" />
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--16" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-455" y="330.66" as="sourcePoint" />
+            <mxPoint x="-377" y="331.16" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EnmxmJAp9iJkFJEcTR9--17" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-230" y="329.66" as="sourcePoint" />
+            <mxPoint x="-152" y="330.16" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
