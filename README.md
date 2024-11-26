@@ -32,11 +32,20 @@ Energizta is trying to address these problems and provide a set of tools to repo
 
 If you whant to quickly contribute to our data repository you can follow these steps.
 
+### Prerequisites on Debian/Ubuntu
+```bash
+sudo apt-get install git awk sed curl lshw stress-ng
+```
+
+### Prerequisites on Fedora/CentOS/Rocky/Alma
+```bash
+sudo dnf install git awk sed curl lshw stress-ng freeipmi ipmitool lm_sensors lsb_release  
+```
+
+### Install script
 ```bash
 wget https://raw.githubusercontent.com/Boavizta/Energizta/main/energizta/energizta.sh
 chmod +x energizta.sh
-sudo apt-get install awk sed curl lshw stress-ng
-
 sudo ./energizta.sh --stresstest --send-to-db
 ```
 
